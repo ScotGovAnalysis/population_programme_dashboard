@@ -29,6 +29,9 @@ year_quarters <- paste0(rep(as.character(c((current_year - 12):(current_year))),
 ##                       Reading Raw Data                       ##
 ##################################################################
 
+# These are in order of how they appear on the mockup
+# Will change this to a more sensible order eg. static files, API calls
+
 ##----------------------------------------------------------------
 ##                     Population Structure                     --
 ##----------------------------------------------------------------
