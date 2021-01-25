@@ -4,6 +4,7 @@
 
 server <- function(input, output) {
   
+  
   url <- a("Population Taskforce", href = "https://www.google.com/")
   
   output$subheader <- renderUI({
@@ -17,87 +18,133 @@ server <- function(input, output) {
 #################################################################
 ##                      Reactive Datasets                      ##
 #################################################################
-  
   # This is where I'll generate the datasets that respond to the 
   # council area inputs and relevant filtering which can then be 
   # removed from the table renders below
+ 
+ cb <- htmlwidgets::JS('function(){debugger;HTMLWidgets.staticRender();}')
   
-  # population_structure_age <- reactive({
-  #   pop_structure %>% 
-  #     filter(area == "Scotland",
-  #            age != "All") %>% 
-  #     group_by(indicator, age)
-  # })
+
+
+# Decreasing Population  ------------------------------------------------
+decreasing_pop_reactive <- reactive({
+  decreasing_pop %>%
+    filter(area == "Scotland") %>% 
+      group_by(indicator) %>%
+      summarise("Scotland" = spk_chr(c(decreased),
+                                   fillColor = F,
+                                   lineWidth = 3,
+                               tooltipFormat = '{{y}}')) %>%
+      left_join(decreasing_pop_by_data_zone %>%
+                  filter(area == "City of Edinburgh") %>% 
+                  group_by(indicator) %>%
+                  summarise(council1 = spk_chr(c(decreased),
+                                   fillColor = F,
+                                   lineWidth = 3,
+                               tooltipFormat = '{{y}}'))) %>%
+      left_join(decreasing_pop_by_data_zone %>%
+                  filter(area %in% input$council_2) %>% 
+                  group_by(indicator) %>%
+                  summarise(council2 = spk_chr(c(decreased),
+                                   fillColor = F,
+                                   lineWidth = 3,
+                               tooltipFormat = '{{y}}')))%>% 
+    mutate_all(~replace(., is.na(.), " "))
+
+  })
+
+# All other datasets -------------------------------------------
+
+  combined_datasets_reactive <- reactive({
+  combined_datasets %>%
+      filter(area == "Scotland") %>% 
+      group_by(indicator, age, sex) %>% 
+      summarise("Scotland" = spk_chr(c(value), 
+                                   fillColor = F, 
+                                   lineWidth = 3,
+                               tooltipFormat = '{{y}}')) %>% 
+      left_join(combined_datasets %>%
+      filter(area %in% input$council_1) %>% 
+      group_by(indicator, age, sex) %>% 
+      summarise(council1 = spk_chr(c(value), 
+                                   fillColor = F, 
+                                   lineWidth = 3,
+                               tooltipFormat = '{{y}}'))) %>% 
+      left_join(combined_datasets %>%
+      filter(area %in% input$council_2) %>% 
+      group_by(indicator, age, sex) %>% 
+      summarise(council2 = spk_chr(c(value), 
+                                   fillColor = F, 
+                                   lineWidth = 3,
+                               tooltipFormat = '{{y}}'))) %>% 
+      mutate(age = replace(age, is.na(age), " "),
+             sex = replace(sex, is.na(sex), " ")
+             )
+})
+
+# Components of Change ----------------------------------------------------
+
+components_of_change_reactive <- reactive({
   
-  # active_dependency_ratio <- reactive({  })
-  # healthy_life_expectancy
-  # decreasing_pop_council
-  # decreasing_pop_datazones
-  # mig_net_within_scotland
-  # mig_net_rest_of_uk
-  # mig_net_overseas
-  # mig_net_change
-  # components_of_change
+    components_of_change %>%
+      filter(area == "Scotland") %>% 
+      group_by(indicator, period) %>% 
+      summarise("Scotland" = spk_chr(c(natural_change, net_migration, other_changes),
+                               type = "bar",
+                               barWidth = 12,
+                               tooltipFormat = '{{value}}')) %>%
+    left_join(components_of_change %>%
+      filter(area %in% input$council_1) %>% 
+      group_by(indicator, period) %>% 
+      summarise(council1 = spk_chr(c(natural_change, net_migration, other_changes),
+                               type = "bar",
+                               barWidth = 12,
+                               tooltipFormat = '{{value}}'))) %>%
+    left_join(components_of_change %>%
+      filter(area %in% input$council_2) %>% 
+      group_by(indicator, period) %>% 
+      summarise(council2 = spk_chr(c(natural_change, net_migration, other_changes),
+                               type = "bar",
+                               barWidth = 12,
+                               tooltipFormat = '{{value}}')))
+  })
   
+
+
 ##################################################################
 ##                            Tables                            ##
 ##################################################################
 #TODO Combine these into one table   
 
+
+
   output$table1 <- renderUI({
-    pop_structure %>%
-      filter(area == "Scotland",
-             age != "All") %>%
-      group_by(indicator, age) %>%
-      summarise(Scotland = spk_chr(value,
-                                   fillColor = F,
-                                   lineWidth = 3
-                                   )) %>%
-      formattable(align = c("l", "l", "r")) %>%
+    combined_datasets_reactive() %>%
+      formattable(align = c("l", "l", "l", "r", "r", "r")) %>%
       formattable::as.htmlwidget() %>%
       spk_add_deps() %>%
       {column(width = 12, .)}
   })
-  
+
   output$table2 <- renderUI({
-    adr %>%
-      filter(refArea == "S92000003") %>% 
-      group_by(indicator) %>% 
-      summarise(Scotland = spk_chr(c(value), 
-                                   fillColor = F, 
-                                   lineWidth = 3)) %>%
-      formattable(align = c("l", "r")) %>% 
+    decreasing_pop_reactive() %>%
+      formattable(align = c("l",  "r", "r", "r")) %>%
       formattable::as.htmlwidget() %>%
       spk_add_deps() %>%
       {column(width = 12, .)}
   })
+
   
-  output$table3 <- renderUI({
-    healthy_life_expectancy %>%
-      filter(area == "Scotland") %>% 
-      group_by(indicator, sex) %>% 
-      summarise(Scotland = spk_chr(c(value), 
-                                   fillColor = F, 
-                                   lineWidth = 3)) %>%
-      formattable(align = c("l", "l", "r")) %>% 
+    output$table3 <- renderUI({
+    components_of_change_reactive() %>%
+      formattable(align = c("l", "l", "r", "r", "r")) %>%
       formattable::as.htmlwidget() %>%
       spk_add_deps() %>%
       {column(width = 12, .)}
   })
-  
-  output$table4 <- renderUI({
-    migration_datasets %>%
-      filter(area == "Scotland") %>% 
-      group_by(indicator) %>% 
-      summarise(Scotland = spk_chr(c(value), 
-                                   fillColor = F, 
-                                   lineWidth = 3)) %>%
-      formattable(align = c("l", "r")) %>% 
-      formattable::as.htmlwidget() %>%
-      spk_add_deps() %>%
-      {column(width = 12, .)}
-  })
-  
+    
+
+
 ##################################################################
 ##                           Criteria                           ##
 ##################################################################

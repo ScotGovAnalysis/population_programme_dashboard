@@ -16,33 +16,24 @@ ui <- fluidPage(
       fluidRow(column(6),
 
                column(3,
-                 # Select inputs are just demo's - do not work yet
                  selectInput(
                    "council_1",
                    label = "Select Coucil Area",
-                   choices = list(
-                     "Edinburgh" = 1,
-                     "Glasgow" = 2,
-                     "Aberdeen" = 3
-                   ),
-                   selected = 1)),
+                   choices = area_names$area,
+                   selected = "City of Edinburgh")),
 
                column(3,
                  selectInput(
                    "council_2",
                    label = "Select Coucil Area",
-                   choices = list(
-                     "Edinburgh" = 1,
-                     "Glasgow" = 2,
-                     "Aberdeen" = 3),
-                   selected = 2)
+                   choices = area_names$area,
+                   selected = "Glasgow City")
                  )
                ),
 
       htmlOutput("table1"),
       htmlOutput("table2"),
-      htmlOutput("table3"),
-      htmlOutput("table4")
+      htmlOutput("table3")
     ),
 
     tabPanel(

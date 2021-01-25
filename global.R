@@ -7,10 +7,20 @@ library(dplyr)
 library(formattable)
 library(sparkline)
 library(SPARQL)
+library(DT)
 
 #################################################################
 ##                          Variables                          ##
 #################################################################
+
+file_path_hle <- "data/HLE.xlsx"
+file_path_net_with_scot <- "data/migflow-ca-01-latest-tab1.xlsx"
+file_path_net_overseas <- "data/mig-overseas-admin-sex-tab1.xlsx"
+file_path_components_of_change_19 <- "data/mid-year-pop-est-19-data.xlsx"
+file_path_components_of_change_18 <- "data/mid-year-pop-est-18-tabs.xlsx"
+file_path_ruk <- "data/mig-uk-admin-sex-91-latest-tab2.xlsx"
+area_names <- readxl::read_xlsx("data/area_codes.xlsx")
+data_zone_lookup <- read.csv("data/Datazone2011lookup.csv")
 
 # Assign endpoint for SPARQL queries
 endpoint <- "https://statistics.gov.scot/sparql"
@@ -22,65 +32,42 @@ current_year <- lubridate::year(lubridate::today())
 # e.g. "2009-Q1", "2009-Q2", "2009-Q3", "2009-Q4"
 quarters <- c("-Q1", "-Q2", "-Q3", "-Q4")
 year_quarters <- paste0(rep(as.character(c((current_year - 12):(current_year))),
-  each = length(quarters)),
-  quarters)
+                            each = length(quarters)),
+                        quarters)
 
+source("SPARQL_queries.R")
 ##################################################################
 ##                       Reading Raw Data                       ##
 ##################################################################
-
-# These are in order of how they appear on the mockup
-# Will change this to a more sensible order eg. static files, API calls
 
 ##----------------------------------------------------------------
 ##                     Population Structure                     --
 ##----------------------------------------------------------------
 
-# population structure by age
-# decreasing population by council areas
-pop_structure_query <- paste0("PREFIX qb: <http://purl.org/linked-data/cube#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-select   ?area ?period ?value ?age ?sex ?value
-where { ?data qb:dataSet
-  <http://statistics.gov.scot/data/population-estimates-2011-datazone-linked-dataset>.
-  ?data <http://purl.org/linked-data/sdmx/2009/dimension#refArea> ?refArea.
-  ?data <http://purl.org/linked-data/sdmx/2009/dimension#refPeriod> ?refPeriod.
-  ?data <http://statistics.gov.scot/def/measure-properties/count> ?value.
-  ?data <http://statistics.gov.scot/def/dimension/age> ?ageuri.
-  ?data <http://statistics.gov.scot/def/dimension/sex> ?sexuri.
-  ?refArea rdfs:label ?area .
-  ?refPeriod rdfs:label ?period .
-  ?ageuri rdfs:label ?age .
-  ?sexuri rdfs:label ?sex .
-  filter (strstarts(strafter(str(?refArea),
-        'http://statistics.gov.scot/id/statistical-geography/'),'S12')
-      ||strstarts(strafter(str(?refArea),
-        'http://statistics.gov.scot/id/statistical-geography/'),'S92')).
-  filter (regex(str(?sexuri ), 'all$'))
-  filter (regex(str(?refPeriod ),'", (current_year - 12), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 11), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 10), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 9), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 8), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 7), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 6), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 5), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 4), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 3), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 2), "$')
-        ||regex(str(?refPeriod ),'", (current_year - 1), "$')
-        ||regex(str(?refPeriod ),'", (current_year), "$'))
-}order by ?refPeriod")
-pop_structure <- SPARQL(url = endpoint,
-                        query = pop_structure_query)$results %>%
-  mutate(indicator = "Population Structure")
+pop_structure <- opendatascot:::ods_query_database(endpoint, pop_structure_query) %>%
+  mutate(indicator = "Population Structure",
+         sex = NA)
 
+# Decreasing Population ---------------------------------------------------
+
+decreasing_pop_by_council_area <- pop_structure %>% 
+  filter(age == "All",
+         area != "Scotland") %>%
+  group_by(area) %>% 
+  arrange(period) %>% 
+  mutate(change = ifelse(value-lag(value) < 0, 1, 0),
+         indicator = "Decreasing Population by council area") %>% 
+  filter(period != 2008) %>% 
+  group_by(period, indicator) %>% 
+  summarise(decreased = sum(change)) %>% 
+  mutate(area = "Scotland")
 
 
 ## ---------------------------------------------------------------
 ##                   Active Dependency Ratio                   --
 ## ---------------------------------------------------------------
-#
+# using opendatascot to deal with the quarters & join the data sets
+## Need area names
 
 # Get economic INACTIVITY
 adr <- opendatascot::ods_dataset(
@@ -107,152 +94,166 @@ adr <- opendatascot::ods_dataset(
  # calculate ADR with inactivity/activity multiplied by 1000
   mutate(
     value = (inactivity / activity) * 1000,
-    indicator = "Active Dependency Ratio"
-  )
+    indicator = "Active Dependency Ratio",
+  ) %>% 
+  left_join(area_names, by = c("refArea" = "area_code")) %>% 
+  ungroup() %>% 
+  select(area, period = "refPeriod", value, indicator) %>% 
+  mutate(sex = NA,
+         age = NA)
 
 
 ## ---------------------------------------------------------------
 ##                   Healthy life expectancy                   --
 ## ---------------------------------------------------------------
 
-# TODO Only has 2015-2017 & 2016-2018 - Use static for earlier years
-hle_query <- "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?area ?period ?age ?value ?sex
-WHERE {
-  ?obs <http://purl.org/linked-data/cube#dataSet>
-  <http://statistics.gov.scot/data/healthy-life-expectancy> .
- ?obs <http://purl.org/linked-data/sdmx/2009/dimension#refArea> ?areauri .
- ?obs <http://purl.org/linked-data/sdmx/2009/dimension#refPeriod> ?perioduri .
- ?obs <http://statistics.gov.scot/def/measure-properties/count> ?value .
- ?obs <http://statistics.gov.scot/def/dimension/age> ?ageuri .
- ?obs <http://statistics.gov.scot/def/dimension/sex> ?sexuri .
- ?areauri rdfs:label ?area .
- ?perioduri rdfs:label ?period .
- ?ageuri rdfs:label ?age .
- ?sexuri rdfs:label ?sex .
- FILTER regex(?age,'^0 years') .
-} order by ?period"
-healthy_life_expectancy <- SPARQL(url = endpoint, query = hle_query)$results %>%
+
+hle <- opendatascot:::ods_query_database(endpoint, hle_query) %>%
   mutate(indicator = "Healthy Life Expectancy")
 
+# Join static healthy life expectancy data to API datset 
+    # Statistics.gov.scot only has > 2015 - 2016
+healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>% 
+  select("area" = Area_name,
+         "period" = Period,
+         "age" = `Age group`,
+         "value" = `Healthy Life Expectancy (HLE) _`,
+         "sex" = Sex
+         ) %>%
+  mutate(indicator = "Healthy Life Expectancy",
+         # Match static file date format to stats.gov.scot dataset
+         period = gsub('-', '-20', period),
+         sex = gsub('s', '', sex),
+         age = "0 years") %>% 
+  # Remove any dates that are already in stats.gov.scot dataset
+  filter(!(period %in% hle$period)) %>% 
+  rbind(hle) %>% 
+  arrange(period) %>% 
+  mutate(age = NA)
 
 ## ---------------------------------------------------------------
 ##               Population Decline - Data Zones               --
 ## ---------------------------------------------------------------
+# Too large for one call
 
-# Use OpenDataScot to more easily break up the data calls
-# otherwise dataset is too large
+# Build as list then unlist to speed up
+
 pop_estimates_datazones <- opendatascot::ods_dataset(
   "population-estimates-2011-datazone-linked-dataset",
   geography = "dz",
   sex = "all",
   age = "all",
-  refPeriod = as.character(c((current_year - 12):(current_year - 9)))
+  refPeriod = as.character(c((current_year - 13):(current_year - 10)))
 ) %>%
   rbind(opendatascot::ods_dataset(
     "population-estimates-2011-datazone-linked-dataset",
     geography = "dz",
     sex = "all",
     age = "all",
-    refPeriod = as.character(c((current_year - 8):(current_year - 5)))
+    refPeriod = as.character(c((current_year - 9):(current_year - 6)))
   )) %>%
   rbind(opendatascot::ods_dataset(
     "population-estimates-2011-datazone-linked-dataset",
     geography = "dz",
     sex = "all",
     age = "all",
-    refPeriod = as.character(c((current_year - 4):current_year))
+    refPeriod = as.character(c((current_year - 5):current_year))
   )) %>%
   mutate(indicator = "Population Data Zones") %>%
   select(-measureType) %>%
-  rename("area" = refArea) %>%
-  # Make data set wider by period to calculate no. decreasing each year
-  tidyr::pivot_wider(names_from = refPeriod, values_from = value)
+  rename("zone" = refArea) 
 
-
+decreasing_pop_by_data_zone <- pop_estimates_datazones %>% 
+  group_by(zone) %>% 
+  arrange(refPeriod) %>% 
+  mutate(value = as.numeric(value),
+         change = ifelse(value-lag(value) < 0, 1, 0),
+         indicator = "Decreasing Population by data zone") %>% 
+  filter(refPeriod != 2008) %>% 
+  left_join(data_zone_lookup, by = c("zone" = "DZ2011_Code")) %>%  
+  rename("area" = LA_Name) %>% 
+  group_by(area, refPeriod, indicator) %>% 
+  summarise(decreased = sum(change)) %>% 
+  rbind(pop_estimates_datazones %>% 
+          group_by(zone) %>% 
+          arrange(refPeriod) %>% 
+          mutate(value = as.numeric(value),
+                 change = ifelse(value-lag(value) < 0, 1, 0),
+                 indicator = "Decreasing Population by data zone") %>% 
+          filter(refPeriod != 2008) %>% 
+          group_by(refPeriod, indicator) %>% 
+          summarise(decreased = sum(change)) %>% 
+  mutate(area = "Scotland",
+         "period" = as.numeric(refPeriod)) %>% 
+  select(-refPeriod))
 ## ---------------------------------------------------------------
 ##                     Net Within Scotland                     --
 ## ---------------------------------------------------------------
 
 net_within_scotland <- readxl::read_excel(
-  "data/migflow-ca-01-latest-tab1.xlsx",
+  file_path_net_with_scot,
   sheet = "TS - Internal Migration",
-  range = "A5:T38"
-) %>%
-  rename(area_code = `...1`,
-         area_name = `...2`)
-# Fix unnamed first row
-net_within_scotland[[1]][1] <- "S92000003"
-net_within_scotland[[2]][1] <- "Scotland"
+  range = "B5:T38"
+) %>% 
+  tidyr::pivot_longer(2:19, names_to = "period", values_to = "value") %>% 
+  rename("area" = `...1`) %>% 
+mutate(area = gsub("Total Moves within Scotland3", "Scotland", area),
+       "sex" = NA,
+       "age" = NA, 
+       indicator = "Net within Scotland")
+
 
 
 ## ----------------------------------------------------------------
 ##                      Net rest of the UK                      --
 ## ----------------------------------------------------------------
-net_ruk_query <- "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?area ?period ?age ?value ?sex
-WHERE {
-  ?obs <http://purl.org/linked-data/cube#dataSet>
-  <http://statistics.gov.scot/data/migration-to-and-from-scotland> .
-  ?obs <http://purl.org/linked-data/sdmx/2009/dimension#refArea> ?areauri .
-  ?obs <http://purl.org/linked-data/sdmx/2009/dimension#refPeriod> ?perioduri .
-  ?obs <http://statistics.gov.scot/def/measure-properties/count> ?value .
-  ?obs <http://statistics.gov.scot/def/dimension/age> ?ageuri .
-  ?obs <http://statistics.gov.scot/def/dimension/sex> ?sexuri .
-  ?obs <http://statistics.gov.scot/def/dimension/migrationType> ?typeuri .
-  ?obs <http://statistics.gov.scot/def/dimension/migrationSource> ?sourceuri .
-  ?areauri rdfs:label ?area .
-  ?perioduri rdfs:label ?period .
-  ?ageuri rdfs:label ?age .
-  ?sexuri rdfs:label ?sex .
-  ?typeuri rdfs:label ?type .
-  ?sourceuri rdfs:label ?source .
-  FILTER regex(?age, 'All') .
-  FILTER regex(?sex, 'All') .
-  FILTER regex(?type, 'Net') .
-  FILTER (?period > 2008) .
-  FILTER regex(?source, 'To-from Rest of UK') .
-}"
-net_ruk_scotland <- SPARQL(url = endpoint, query = net_ruk_query)$results %>%
-  mutate(indicator = "Net Migration - rUK")
+
+# net_ruk_scotland <- opendatascot:::ods_query_database(endpoint, net_ruk_query) %>% 
+#   mutate(indicator = "Net Migration - Rest of UK")
+
+
+net_ruk <- readxl::read_xlsx(file_path_ruk,
+                                   sheet = "Net-Council-Sex (2001-)",
+                                  range = "A5:T38") %>% 
+  tidyr::pivot_longer(3:20, names_to = "period", values_to = "value") %>% 
+  select("area" = `...2`, 
+         period, 
+         value) %>% 
+  mutate("sex" = NA, 
+         "age" = NA,
+         indicator = "Net Migration - Rest of UK",
+         area = gsub('SCOTLAND', 'Scotland', area))
+
 
 ## ----------------------------------------------------------------
 ##                         Net Overseas                         --
 ## ----------------------------------------------------------------
 
-net_overseas <- readxl::read_excel("data/mig-overseas-admin-sex-tab1.xlsx",
+net_overseas <- readxl::read_excel(file_path_net_overseas,
                                    sheet = "Net-Council Area-Sex",
                                    range = "A5:T38"
-)
+) %>% 
+  tidyr::pivot_longer(3:20, names_to = "period", values_to = "value") %>% 
+  select("area" = `...2`, 
+         period, 
+         value) %>% 
+  mutate("sex" = NA, 
+         "age" = NA,
+         indicator = "Net Overseas",
+         area = gsub('SCOTLAND', 'Scotland', area))
+
 
 
 ## ----------------------------------------------------------------
 ##                     Total Net Migration                      --
 ## ----------------------------------------------------------------
 
-net_migration_query <- "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?area ?period ?age ?value ?sex
-WHERE {
-  ?obs <http://purl.org/linked-data/cube#dataSet>
-  <http://statistics.gov.scot/data/net-migration> .
-  ?obs <http://purl.org/linked-data/sdmx/2009/dimension#refArea> ?areauri .
-  ?obs <http://purl.org/linked-data/sdmx/2009/dimension#refPeriod> ?perioduri .
-  ?obs <http://statistics.gov.scot/def/measure-properties/count> ?value .
-  ?obs <http://statistics.gov.scot/def/dimension/age> ?ageuri .
-  ?obs <http://statistics.gov.scot/def/dimension/sex> ?sexuri .
-  ?areauri rdfs:label ?area .
-  ?perioduri rdfs:label ?period .
-  ?ageuri rdfs:label ?age .
-  ?sexuri rdfs:label ?sex .
-  FILTER regex(?age, 'All') .
-  FILTER regex(?sex, 'All') .
-  FILTER (?period > 2008) .
-}"
 
-total_net_migration <- SPARQL(url = endpoint,
-                              query = net_migration_query)$results %>%
-  mutate(indicator = "Total Net Migration")
-
+total_net_migration <- opendatascot:::ods_query_database(endpoint, 
+                                                         net_migration_query) %>%
+  mutate(indicator = "Total Net Migration",
+         age = NA,
+         sex = NA)
 
 ## ----------------------------------------------------------------
 ##                     Components of Change                     --
@@ -261,19 +262,48 @@ total_net_migration <- SPARQL(url = endpoint,
 ## one year - potentially show 2 years
 
 components_of_change <- readxl::read_excel(
-  "data/mid-year-pop-est-19-data.xlsx",
+  file_path_components_of_change_19,
   range = "A3:K39",
   sheet = "Table 4") %>%
   janitor::clean_names() %>%
-  filter(!(is.na(area_code1_2)))
-
-
-
-
-
+  filter(!(is.na(area_code1_2))) %>% 
+  select("area" = area_name,
+         "other_changes" = other_changes4,
+         "net_migration" = estimated_net_civilian_migration3,
+         natural_change
+         ) %>% 
+  mutate(period = 2019) %>% 
+  # Join 2018 data
+  rbind(readxl::read_excel(
+  file_path_components_of_change_18,
+  range = "A3:K39",
+  sheet = "Table 4") %>%
+  janitor::clean_names() %>%
+  filter(!(is.na(area_code1))) %>%  
+  select("area" = area2,
+         "other_changes" = other_changes4,
+         "net_migration" = estimated_net_civilian_migration3,
+         natural_change
+         ) %>% 
+  mutate(period = 2018)) %>% 
+  mutate(indicator = "Components of Change")
 
 ##################################################################
 ##                         Combine Data                         ##
 ##################################################################
 
-migration_datasets <- net_ruk_scotland %>% rbind(total_net_migration)
+
+combined_datasets <- pop_structure %>% 
+  filter(age != "All") %>% 
+  rbind(adr,
+        healthy_life_expectancy,
+        net_ruk,
+        total_net_migration,
+        net_overseas,
+        net_within_scotland)
+
+decreasing_pop <-  decreasing_pop_by_council_area %>% 
+  rbind(decreasing_pop_by_data_zone)
+
+
+
