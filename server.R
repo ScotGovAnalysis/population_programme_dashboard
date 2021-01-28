@@ -30,30 +30,42 @@ server <- function(input, output, session) {
     council2 <- input$council_2
     
   combined_datasets %>%
-      filter(area == "Scotland") %>% 
-      group_by(`  `, ` `) %>% 
-      summarise("Scotland" = spk_chr(c(value), 
-                                    fillColor = F,  
+      filter(area == "Scotland") %>%
+      group_by(`  `, ` `) %>%
+      summarise("Scotland" = spk_chr(values = c(value),
+                                     type = "line",
+                                    fillColor = F,
                                    lineColor = "#2DA197",
-                                   lineWidth = 3,
-                                   tooltipFormat = '{{x}}: {{y}}'
-                               )) %>% 
+                                   spotColor = "#92208f",
+                                   minSpotColor = "#92208f",
+                                   maxSpotColor = "#92208f",
+                                   lineWidth = 4,
+                                   spotRadius = 3,
+                                   tooltipFormat = '{{y}}')) %>%
       left_join(combined_datasets %>%
-      filter(area %in% council1) %>% 
-      group_by(`  `, ` `) %>% 
-      summarise({{council1}} := spk_chr(c(value), 
-                                        fillColor = F,   
+      filter(area %in% council1) %>%
+      group_by(`  `, ` `) %>%
+      summarise({{council1}} := spk_chr(c(value),
+                                        fillColor = F,
                                    lineColor = "#2DA197",
-                                   lineWidth = 3,
-                                   tooltipFormat = '{{x}}: {{y}}'
-                               ))) %>% 
+                                   spotColor = "#92208f",
+                                   minSpotColor = "#92208f",
+                                   maxSpotColor = "#92208f",
+                                   lineWidth = 4,
+                                   spotRadius = 3,
+                                   tooltipFormat = '{{y}}'
+                                   ))) %>% 
       left_join(combined_datasets %>%
       filter(area %in% council2) %>% 
       group_by(`  `, ` `) %>% 
       summarise({{council2}} := spk_chr(c(value), 
                                         fillColor = F,    
                                    lineColor = "#2DA197",
-                                   lineWidth = 3,
+                                   spotColor = "#92208f",
+                                   minSpotColor = "#92208f",
+                                   maxSpotColor = "#92208f",
+                                   lineWidth = 4,
+                                   spotRadius = 3,
                                    tooltipFormat = '{{x}}: {{y}}'
                                ))) %>% 
     arrange(match(`  `, Indicator_order))
