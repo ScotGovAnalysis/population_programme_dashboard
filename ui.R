@@ -4,8 +4,10 @@
 ##################################################################
 
 ui <- fluidPage(
+  #theme = shinythemes::shinytheme("darkly"),
   titlePanel("Population Programme"),
   uiOutput("subheader"),
+  
   br(),
 
   mainPanel(tabsetPanel(
@@ -18,22 +20,21 @@ ui <- fluidPage(
                column(3,
                  selectInput(
                    "council_1",
-                   label = "Select Coucil Area",
+                   label = "Select Council Area",
                    choices = area_names$area,
                    selected = "City of Edinburgh")),
 
                column(3,
                  selectInput(
                    "council_2",
-                   label = "Select Coucil Area",
+                   label = "Select Council Area",
                    choices = area_names$area,
                    selected = "Glasgow City")
                  )
                ),
-
-      htmlOutput("table1"),
-      htmlOutput("table2"),
-      htmlOutput("table3")
+      htmlwidgets::getDependency('sparkline'),
+      dataTableOutput("table1"),
+      dataTableOutput("table2")
     ),
 
     tabPanel(

@@ -2,7 +2,7 @@
 ##                            Server                            ##
 ##################################################################
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   
   url <- a("Population Taskforce", href = "https://www.google.com/")
@@ -11,100 +11,89 @@ server <- function(input, output) {
     tagList(
       "This dashboard supports the",
       url,
-      "to understand the demographic challenges in Scotland"
+      "to understand the demographic challenges in Scotland."
     )
   })
+  
+  cb <- htmlwidgets::JS('function(){debugger;HTMLWidgets.staticRender();}')
   
 #################################################################
 ##                      Reactive Datasets                      ##
 #################################################################
-  # This is where I'll generate the datasets that respond to the 
-  # council area inputs and relevant filtering which can then be 
-  # removed from the table renders below
- 
- cb <- htmlwidgets::JS('function(){debugger;HTMLWidgets.staticRender();}')
-  
 
-
-# Decreasing Population  ------------------------------------------------
-decreasing_pop_reactive <- reactive({
-  decreasing_pop %>%
-    filter(area == "Scotland") %>% 
-      group_by(indicator) %>%
-      summarise("Scotland" = spk_chr(c(decreased),
-                                   fillColor = F,
-                                   lineWidth = 3,
-                               tooltipFormat = '{{y}}')) %>%
-      left_join(decreasing_pop_by_data_zone %>%
-                  filter(area == "City of Edinburgh") %>% 
-                  group_by(indicator) %>%
-                  summarise(council1 = spk_chr(c(decreased),
-                                   fillColor = F,
-                                   lineWidth = 3,
-                               tooltipFormat = '{{y}}'))) %>%
-      left_join(decreasing_pop_by_data_zone %>%
-                  filter(area %in% input$council_2) %>% 
-                  group_by(indicator) %>%
-                  summarise(council2 = spk_chr(c(decreased),
-                                   fillColor = F,
-                                   lineWidth = 3,
-                               tooltipFormat = '{{y}}')))%>% 
-    mutate_all(~replace(., is.na(.), " "))
-
-  })
 
 # All other datasets -------------------------------------------
 
   combined_datasets_reactive <- reactive({
+    
+    council1 <- input$council_1
+    council2 <- input$council_2
+    
   combined_datasets %>%
       filter(area == "Scotland") %>% 
-      group_by(indicator, age, sex) %>% 
+      group_by(`  `, ` `) %>% 
       summarise("Scotland" = spk_chr(c(value), 
-                                   fillColor = F, 
+                                    fillColor = F,  
+                                   lineColor = "#2DA197",
                                    lineWidth = 3,
-                               tooltipFormat = '{{y}}')) %>% 
+                                   tooltipFormat = '{{x}}: {{y}}'
+                               )) %>% 
       left_join(combined_datasets %>%
-      filter(area %in% input$council_1) %>% 
-      group_by(indicator, age, sex) %>% 
-      summarise(council1 = spk_chr(c(value), 
-                                   fillColor = F, 
+      filter(area %in% council1) %>% 
+      group_by(`  `, ` `) %>% 
+      summarise({{council1}} := spk_chr(c(value), 
+                                        fillColor = F,   
+                                   lineColor = "#2DA197",
                                    lineWidth = 3,
-                               tooltipFormat = '{{y}}'))) %>% 
+                                   tooltipFormat = '{{x}}: {{y}}'
+                               ))) %>% 
       left_join(combined_datasets %>%
-      filter(area %in% input$council_2) %>% 
-      group_by(indicator, age, sex) %>% 
-      summarise(council2 = spk_chr(c(value), 
-                                   fillColor = F, 
+      filter(area %in% council2) %>% 
+      group_by(`  `, ` `) %>% 
+      summarise({{council2}} := spk_chr(c(value), 
+                                        fillColor = F,    
+                                   lineColor = "#2DA197",
                                    lineWidth = 3,
-                               tooltipFormat = '{{y}}'))) %>% 
-      mutate(age = replace(age, is.na(age), " "),
-             sex = replace(sex, is.na(sex), " ")
-             )
+                                   tooltipFormat = '{{x}}: {{y}}'
+                               ))) %>% 
+      #mutate(` ` = replace(` `, is.na(` `), " ")
+       #      )  %>% 
+    arrange(match(`  `, Indicator_order))
 })
 
+  
 # Components of Change ----------------------------------------------------
 
 components_of_change_reactive <- reactive({
   
+  council1 <- input$council_1
+  council2 <- input$council_2
+  
     components_of_change %>%
       filter(area == "Scotland") %>% 
-      group_by(indicator, period) %>% 
+      group_by(`  `, period) %>% 
       summarise("Scotland" = spk_chr(c(natural_change, net_migration, other_changes),
                                type = "bar",
+                               barColor = "#2DA197",
+                               negBarColor = "#92208f",
                                barWidth = 12,
                                tooltipFormat = '{{value}}')) %>%
     left_join(components_of_change %>%
-      filter(area %in% input$council_1) %>% 
-      group_by(indicator, period) %>% 
-      summarise(council1 = spk_chr(c(natural_change, net_migration, other_changes),
+      filter(area %in% council1) %>% 
+      group_by(`  `, period) %>% 
+      summarise({{council1}} := spk_chr(c(natural_change, net_migration, other_changes),
                                type = "bar",
+                               barColor = "#2DA197",
+                               negBarColor = "#92208f",
                                barWidth = 12,
                                tooltipFormat = '{{value}}'))) %>%
     left_join(components_of_change %>%
-      filter(area %in% input$council_2) %>% 
-      group_by(indicator, period) %>% 
-      summarise(council2 = spk_chr(c(natural_change, net_migration, other_changes),
+      filter(area %in% council2) %>% 
+      group_by(`  `, period) %>% 
+      summarise({{council2}} := spk_chr(c(natural_change, net_migration, other_changes),
                                type = "bar",
+                               barColor = "#2DA197",
+                               negBarColor = "#92208f",
                                barWidth = 12,
                                tooltipFormat = '{{value}}')))
   })
@@ -116,33 +105,54 @@ components_of_change_reactive <- reactive({
 ##################################################################
 #TODO Combine these into one table   
 
-
-
-  output$table1 <- renderUI({
-    combined_datasets_reactive() %>%
-      formattable(align = c("l", "l", "l", "r", "r", "r")) %>%
-      formattable::as.htmlwidget() %>%
-      spk_add_deps() %>%
-      {column(width = 12, .)}
-  })
-
-  output$table2 <- renderUI({
-    decreasing_pop_reactive() %>%
-      formattable(align = c("l",  "r", "r", "r")) %>%
-      formattable::as.htmlwidget() %>%
-      spk_add_deps() %>%
-      {column(width = 12, .)}
-  })
-
-  
-    output$table3 <- renderUI({
-    components_of_change_reactive() %>%
-      formattable(align = c("l", "l", "r", "r", "r")) %>%
-      formattable::as.htmlwidget() %>%
-      spk_add_deps() %>%
-      {column(width = 12, .)}
-  })
+  output$table1 <- renderDataTable({
     
+    dtable <- datatable(
+      combined_datasets_reactive(),
+      escape = FALSE,
+      class = 'row-border',
+      rownames = FALSE,
+      options = list(
+        rowsGroup = list(0),
+        drawCallback =  cb,
+        columnDefs = list(list(
+          className = 'dt-center', targets = 2:4)),
+        dom = 'ft',
+        lengthChange = FALSE,
+        bInfo = FALSE,
+        bPaginate = FALSE,
+        bSort = FALSE,
+        bFilter = FALSE
+      ))
+    
+    # for merging the Indicators 
+    # https://stackoverflow.com/questions/39484118/shiny-merge-cells-in-dtdatatable
+    dep <- htmltools::htmlDependency(
+      "RowsGroup", "2.0.0", 
+      "www/", script = "dataTables.rowsGroup.js")
+    
+    dtable$dependencies <- c(dtable$dependencies, list(dep))
+    dtable
+    
+  })
+
+
+  output$table2 <- renderDataTable(
+    expr = components_of_change_reactive(),
+    escape = FALSE,
+    class = 'row-border',
+    rownames = FALSE,
+    options = list(
+      drawCallback =  cb,
+      columnDefs = list(list(className = 'dt-center', targets = 1:4)),
+      dom = 'ft',
+      lengthChange = FALSE,
+      bInfo = FALSE,
+      bPaginate = FALSE,
+      bSort = FALSE,
+      bFilter = FALSE
+    )
+  )
 
 
 ##################################################################
