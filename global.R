@@ -362,7 +362,7 @@ components_of_change <- readxl::read_excel(
 ##################################################################
 ##                         Combine Data                         ##
 ##################################################################
-
+ 
 combined_datasets <- pop_structure %>% 
   filter(age != "All",
          period >= (current_year - 12)) %>% 
