@@ -120,5 +120,5 @@ WHERE {
   ?sexuri rdfs:label ?sex .
   FILTER regex(?age, 'All') .
   FILTER regex(?sex, 'All') .
-  FILTER (?period > 2008) .
+  FILTER (?period > 2009) .
 }"

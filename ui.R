@@ -4,7 +4,11 @@
 ##################################################################
 
 ui <- fluidPage(
-  #theme = shinythemes::shinytheme("darkly"),
+  
+  # tags$style(HTML("
+  #   .tabbable > .nav > li > a {background-color: aqua;  color:black; hover: red;}
+  # ")),
+  
   titlePanel("Population Programme"),
   uiOutput("subheader"),
   
@@ -21,14 +25,14 @@ ui <- fluidPage(
                  selectInput(
                    "council_1",
                    label = "Select Council Area",
-                   choices = area_names$area,
+                   choices = area_name_lookup$area,
                    selected = "City of Edinburgh")),
 
                column(3,
                  selectInput(
                    "council_2",
                    label = "Select Council Area",
-                   choices = area_names$area,
+                   choices = area_name_lookup$area,
                    selected = "Glasgow City")
                  )
                ),
