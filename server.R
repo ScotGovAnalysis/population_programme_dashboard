@@ -56,8 +56,6 @@ server <- function(input, output, session) {
                                    lineWidth = 3,
                                    tooltipFormat = '{{x}}: {{y}}'
                                ))) %>% 
-      #mutate(` ` = replace(` `, is.na(` `), " ")
-       #      )  %>% 
     arrange(match(`  `, Indicator_order))
 })
 

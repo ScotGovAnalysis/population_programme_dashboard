@@ -68,28 +68,33 @@ pop_structure <- opendatascot:::ods_query_database(endpoint, pop_structure_query
   mutate("  " = "Population Structure",
          sex = "")
 
-# Decreasing Population ---------------------------------------------------
+# Population Change by Council area -------------------------------
 
 pop_change_by_council_area <- pop_structure %>% 
+  # Remove scotland and calculate number of decreased population areas
   filter(age == "All",
          area != "Scotland") %>%
   group_by(area) %>% 
   arrange(period) %>% 
   mutate(change = ifelse(value-lag(value) < 0, 1, 0),
          " " = "Decreased council areas") %>% 
-  filter(period != 2008) %>% 
+  # remove 2008 - It was needed to calculate 2009)
+  filter(period >= current_year-12) %>% 
   group_by(period, ` `) %>% 
+  # Sum the number of decreased areas for Scotland's total
   summarise(value = sum(change)) %>% 
   mutate(area = "Scotland") %>% 
   rbind(pop_structure %>% 
+          # Remove scotland and calculate number of increased population areas
           filter(age == "All",
                  area != "Scotland") %>%
           group_by(area) %>% 
           arrange(period) %>% 
           mutate(change = ifelse(value-lag(value) < 0, 0, 1),
                  " " = "Increased council areas") %>% 
-          filter(period != 2008) %>% 
+          filter(period >= current_year-12) %>% 
           group_by(period, ` `) %>% 
+          # Sum the number of increased areas for Scotland's total
           summarise(value = sum(change)) %>% 
           mutate(area = "Scotland")) %>% 
   mutate("  " = "Population Change")
@@ -98,8 +103,6 @@ pop_change_by_council_area <- pop_structure %>%
 ## ---------------------------------------------------------------
 ##                   Active Dependency Ratio                   --
 ## ---------------------------------------------------------------
-# using opendatascot to deal with the quarters & join the data sets
-## Need area names
 
 # Get economic INACTIVITY
 adr <- opendatascot::ods_dataset(
@@ -359,9 +362,10 @@ components_of_change <- readxl::read_excel(
 ##################################################################
 ##                         Combine Data                         ##
 ##################################################################
-
+ 
 combined_datasets <- pop_structure %>% 
-  filter(age != "All") %>% 
+  filter(age != "All",
+         period >= (current_year - 12)) %>% 
   rbind(adr,
         healthy_life_expectancy) %>% 
   mutate(" " = paste(age, sex)) %>% 
