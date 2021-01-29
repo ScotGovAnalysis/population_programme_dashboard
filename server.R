@@ -35,31 +35,34 @@ server <- function(input, output, session) {
       summarise("Scotland" = spk_chr(values = c(value),
                                      type = "line",
                                     fillColor = F,
+                                    xvalues = period,
                                    lineColor = "#2DA197",
                                    spotColor = "#92208f",
                                    minSpotColor = "#92208f",
                                    maxSpotColor = "#92208f",
                                    lineWidth = 4,
                                    spotRadius = 3,
-                                   tooltipFormat = '{{y}}')) %>%
+                                   tooltipFormat = '{{x}}: {{y}}')) %>%
       left_join(combined_datasets %>%
       filter(area %in% council1) %>%
       group_by(`  `, ` `) %>%
       summarise({{council1}} := spk_chr(c(value),
                                         fillColor = F,
+                                        xvalues = period,
                                    lineColor = "#2DA197",
                                    spotColor = "#92208f",
                                    minSpotColor = "#92208f",
                                    maxSpotColor = "#92208f",
                                    lineWidth = 4,
                                    spotRadius = 3,
-                                   tooltipFormat = '{{y}}'
+                                   tooltipFormat = '{{x}}: {{y}}'
                                    ))) %>% 
       left_join(combined_datasets %>%
       filter(area %in% council2) %>% 
       group_by(`  `, ` `) %>% 
       summarise({{council2}} := spk_chr(c(value), 
-                                        fillColor = F,    
+                                        fillColor = F,
+                                        xvalues = period,
                                    lineColor = "#2DA197",
                                    spotColor = "#92208f",
                                    minSpotColor = "#92208f",
@@ -126,7 +129,10 @@ components_of_change_reactive <- reactive({
         rowsGroup = list(0),
         drawCallback =  cb,
         columnDefs = list(list(
-          className = 'dt-center', targets = 2:4)),
+          className = 'dt-center',
+          width = '125',
+          targets = 2:4
+        )),
         dom = 'ft',
         lengthChange = FALSE,
         bInfo = FALSE,
@@ -154,7 +160,11 @@ components_of_change_reactive <- reactive({
     rownames = FALSE,
     options = list(
       drawCallback =  cb,
-      columnDefs = list(list(className = 'dt-center', targets = 1:4)),
+      columnDefs = list(list(
+        className = 'dt-center',
+        width = '125',
+        targets = "_all"
+      )),
       dom = 'ft',
       lengthChange = FALSE,
       bInfo = FALSE,
