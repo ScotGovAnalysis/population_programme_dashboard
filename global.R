@@ -16,6 +16,8 @@ library(DT)
 # Read in static data files
 
 #Healthy life expectancy
+# This file has been modified to ad NA's to all the years with 
+# missing values for the coucnil areas
 file_path_hle <- "data/HLE.xlsx"
 # Net Migration within Scotland
 file_path_net_with_scot <- "data/migflow-ca-01-latest-tab1.xlsx"
@@ -111,7 +113,6 @@ adr <- opendatascot::ods_dataset(
   gender = "all",
   refPeriod = year_quarters
 ) %>%
-  rename("sex" = gender) %>%
   group_by(refArea, refPeriod) %>%
   summarise(inactivity = sum(as.numeric(value))) %>%
 # Join economic ACTIVITY
@@ -121,11 +122,13 @@ adr <- opendatascot::ods_dataset(
     gender = "all",
     refPeriod = year_quarters
   ) %>%
-    rename("sex" = gender) %>%
-    mutate(refPeriod = factor(refPeriod,
-                              levels = year_quarters)) %>%
+    # Remove the "-QX" to make it numeric 
+    # mutate(refPeriod = factor(refPeriod,
+    #                           levels = year_quarters,
+    #                           ordered = T)) %>%
     group_by(refArea, refPeriod) %>%
     summarise(activity = sum(as.numeric(value)))) %>%
+  mutate(period = as.numeric(gsub("-.*", "", refPeriod))) %>% 
  # calculate ADR with inactivity/activity multiplied by 1000
   mutate(
     value = round((inactivity / activity) * 1000, digits = 2),
@@ -133,7 +136,7 @@ adr <- opendatascot::ods_dataset(
   ) %>% 
   left_join(area_name_lookup, by = c("refArea" = "area_code")) %>% 
   ungroup() %>% 
-  select(area, period = "refPeriod", value, "  ") %>% 
+  select(area, period, value, "  ") %>% 
   mutate(sex = "",
          age = "")
 
@@ -157,15 +160,12 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
          ) %>%
   mutate("  " = "Healthy Life Expectancy",
          value = round(value, digits = 2),
-         # Match static file date format to stats.gov.scot dataset
-         period = gsub('-', '-20', period),
-         sex = gsub('s', '', sex),
-         age = "0 years") %>% 
+         sex = gsub('s', '', sex)) %>% 
   # Remove any dates that are already in stats.gov.scot dataset
   filter(!(period %in% hle$period)) %>% 
   rbind(hle) %>% 
-  arrange(period) %>% 
-  mutate(age = "")
+  mutate(age = "",
+         period = as.numeric(gsub("-.*", "", period)))
 
 ## ---------------------------------------------------------------
 ##               Population Change - Data Zones               --
