@@ -29,49 +29,66 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
     
-  combined_datasets %>%
+    combined_datasets %>%
       filter(area == "Scotland") %>%
+       arrange(period) %>%
       group_by(`  `, ` `) %>%
-      summarise("Scotland" = spk_chr(values = c(value),
-                                     type = "line",
-                                    fillColor = F,
-                                    xvalues = period,
-                                   lineColor = "#2DA197",
-                                   spotColor = "#92208f",
-                                   minSpotColor = "#92208f",
-                                   maxSpotColor = "#92208f",
-                                   lineWidth = 4,
-                                   spotRadius = 3,
-                                   tooltipFormat = '{{x}}: {{y}}')) %>%
-      left_join(combined_datasets %>%
-      filter(area %in% council1) %>%
-      group_by(`  `, ` `) %>%
-      summarise({{council1}} := spk_chr(c(value),
-                                        fillColor = F,
-                                        xvalues = period,
-                                   lineColor = "#2DA197",
-                                   spotColor = "#92208f",
-                                   minSpotColor = "#92208f",
-                                   maxSpotColor = "#92208f",
-                                   lineWidth = 4,
-                                   spotRadius = 3,
-                                   tooltipFormat = '{{x}}: {{y}}'
-                                   ))) %>% 
-      left_join(combined_datasets %>%
-      filter(area %in% council2) %>% 
-      group_by(`  `, ` `) %>% 
-      summarise({{council2}} := spk_chr(c(value), 
-                                        fillColor = F,
-                                        xvalues = period,
-                                   lineColor = "#2DA197",
-                                   spotColor = "#92208f",
-                                   minSpotColor = "#92208f",
-                                   maxSpotColor = "#92208f",
-                                   lineWidth = 4,
-                                   spotRadius = 3,
-                                   tooltipFormat = '{{x}}: {{y}}'
-                               ))) %>% 
-    arrange(match(`  `, Indicator_order))
+      summarise(
+        "Scotland" = spk_chr(
+          values = c(value),
+          type = "line",
+          xvalues = period,
+          fillColor = F,
+          lineColor = "#2DA197",
+          spotColor = "#92208f",
+          minSpotColor = "#92208f",
+          maxSpotColor = "#92208f",
+          lineWidth = 4,
+          spotRadius = 3,
+          tooltipFormat = '{{x}}: {{y}}'
+        )
+      ) %>%
+      left_join(
+        combined_datasets %>%
+          filter(area %in% council1) %>%
+           arrange(period) %>%
+          group_by(`  `, ` `) %>%
+          summarise({
+            {
+              council1
+            }
+          } := spk_chr(
+            c(value),
+            xvalues = period,
+            fillColor = F,
+            lineColor = "#2DA197",
+            spotColor = "#92208f",
+            minSpotColor = "#92208f",
+            maxSpotColor = "#92208f",
+            lineWidth = 4,
+            spotRadius = 3,
+            tooltipFormat = '{{x}}: {{y}}'
+          ))
+      ) %>%
+      left_join(
+        combined_datasets %>%
+          filter(area %in% council2) %>%
+           arrange(period) %>%
+          group_by(`  `, ` `) %>%
+          summarise({{council2}} := spk_chr(
+            c(value),
+            xvalues = period,
+            fillColor = F,
+            lineColor = "#2DA197",
+            spotColor = "#92208f",
+            minSpotColor = "#92208f",
+            maxSpotColor = "#92208f",
+            lineWidth = 4,
+            spotRadius = 3,
+            tooltipFormat = '{{x}}: {{y}}'
+          ))
+      ) %>%
+      arrange(match(`  `, Indicator_order))
 })
 
   
@@ -141,7 +158,7 @@ components_of_change_reactive <- reactive({
         bFilter = FALSE
       ))
     
-    # for merging the Indicators 
+    # Merge the Indicators column
     # https://stackoverflow.com/questions/39484118/shiny-merge-cells-in-dtdatatable
     dep <- htmltools::htmlDependency(
       "RowsGroup", "2.0.0", 
