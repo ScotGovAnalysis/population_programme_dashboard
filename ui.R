@@ -4,11 +4,7 @@
 ##################################################################
 
 ui <- fluidPage(
-  
-  # tags$style(HTML("
-  #   .tabbable > .nav > li > a {background-color: aqua;  color:black; hover: red;}
-  # ")),
-  
+
   titlePanel("Population Programme"),
   uiOutput("subheader"),
   
