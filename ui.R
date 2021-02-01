@@ -37,7 +37,9 @@ ui <- fluidPage(
                  )
                ),
       htmlwidgets::getDependency('sparkline'),
-      dataTableOutput("table1")
+      dataTableOutput("table1"),
+      br(),
+      br()
     ),
 
     tabPanel(
