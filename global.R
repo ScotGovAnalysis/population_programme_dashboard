@@ -26,8 +26,7 @@ file_path_net_overseas <- "data/mig-overseas-admin-sex-tab1.xlsx"
 # Net Migration - Rest of the UK
 file_path_ruk <- "data/mig-uk-admin-sex-91-latest-tab2.xlsx"
 # Components of change
-file_path_components_of_change_19 <- "data/mid-year-pop-est-19-data.xlsx"
-file_path_components_of_change_18 <- "data/mid-year-pop-est-18-tabs.xlsx"
+file_path_natural_change <- "data/Natural change - 2009-2019.xlsx"
 # Area name lookups
 area_name_lookup <- read.csv("data/area_codes.csv")
 data_zone_lookup <- read.csv("data/Datazone2011lookup.csv")
@@ -332,32 +331,12 @@ total_net_migration <- opendatascot:::ods_query_database(endpoint,
 ## Natural change + net migration + other changes
 ## one year - potentially show 2 years
 
-components_of_change <- readxl::read_excel(
-  file_path_components_of_change_19,
-  range = "A3:K39",
-  sheet = "Table 4") %>%
-  janitor::clean_names() %>%
-  filter(!(is.na(area_code1_2))) %>% 
-  select("area" = area_name,
-         "other_changes" = other_changes4,
-         "net_migration" = estimated_net_civilian_migration3,
-         natural_change
-         ) %>% 
-  mutate(period = 2019) %>% 
-  # Join 2018 data
-  rbind(readxl::read_excel(
-  file_path_components_of_change_18,
-  range = "A3:K39",
-  sheet = "Table 4") %>%
-  janitor::clean_names() %>%
-  filter(!(is.na(area_code1))) %>%  
-  select("area" = area2,
-         "other_changes" = other_changes4,
-         "net_migration" = estimated_net_civilian_migration3,
-         natural_change
-         ) %>% 
-  mutate(period = 2018)) %>% 
-  mutate("  " = "Components of Change")
+natural_change <- readxl::read_excel(file_path_natural_change) %>% 
+  select(period = Year,
+         area = Area,
+         value = `Natural Change`)  %>%
+  mutate(" " = "Natural Change",
+         "  " = "Population Change")
 
 ##################################################################
 ##                         Combine Data                         ##
@@ -375,7 +354,8 @@ combined_datasets <- pop_structure %>%
         net_overseas,
         net_within_scotland,
         pop_change_by_council_area,
-        pop_change_by_data_zone)
+        pop_change_by_data_zone,
+        natural_change)
 
 
 

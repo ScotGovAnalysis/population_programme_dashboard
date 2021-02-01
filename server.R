@@ -91,43 +91,6 @@ server <- function(input, output, session) {
       arrange(match(`  `, Indicator_order))
 })
 
-  
-# Components of Change ----------------------------------------------------
-
-components_of_change_reactive <- reactive({
-  
-  council1 <- input$council_1
-  council2 <- input$council_2
-  
-    components_of_change %>%
-      filter(area == "Scotland") %>% 
-      group_by(`  `, period) %>% 
-      summarise("Scotland" = spk_chr(c(natural_change, net_migration, other_changes),
-                               type = "bar",
-                               barColor = "#2DA197",
-                               negBarColor = "#92208f",
-                               barWidth = 12,
-                               tooltipFormat = '{{value}}')) %>%
-    left_join(components_of_change %>%
-      filter(area %in% council1) %>% 
-      group_by(`  `, period) %>% 
-      summarise({{council1}} := spk_chr(c(natural_change, net_migration, other_changes),
-                               type = "bar",
-                               barColor = "#2DA197",
-                               negBarColor = "#92208f",
-                               barWidth = 12,
-                               tooltipFormat = '{{value}}'))) %>%
-    left_join(components_of_change %>%
-      filter(area %in% council2) %>% 
-      group_by(`  `, period) %>% 
-      summarise({{council2}} := spk_chr(c(natural_change, net_migration, other_changes),
-                               type = "bar",
-                               barColor = "#2DA197",
-                               negBarColor = "#92208f",
-                               barWidth = 12,
-                               tooltipFormat = '{{value}}')))
-  })
-  
 
 
 ##################################################################
@@ -168,28 +131,6 @@ components_of_change_reactive <- reactive({
     dtable
     
   })
-
-
-  output$table2 <- renderDataTable(
-    expr = components_of_change_reactive(),
-    escape = FALSE,
-    class = 'row-border',
-    rownames = FALSE,
-    options = list(
-      drawCallback =  cb,
-      columnDefs = list(list(
-        className = 'dt-center',
-        width = '125',
-        targets = "_all"
-      )),
-      dom = 'ft',
-      lengthChange = FALSE,
-      bInfo = FALSE,
-      bPaginate = FALSE,
-      bSort = FALSE,
-      bFilter = FALSE
-    )
-  )
 
 
 ##################################################################
