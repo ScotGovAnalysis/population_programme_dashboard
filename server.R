@@ -110,7 +110,7 @@ server <- function(input, output, session) {
         drawCallback =  cb,
         columnDefs = list(list(
           className = 'dt-center',
-          width = '125',
+          width = '100',
           targets = 2:4
         )),
         dom = 'ft',
