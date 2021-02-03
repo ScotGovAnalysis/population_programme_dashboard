@@ -145,8 +145,9 @@ adr <- opendatascot::ods_dataset(
 ## ---------------------------------------------------------------
 
 
-hle <- opendatascot:::ods_query_database(endpoint, hle_query) %>%
-  mutate("  " = "Healthy Life Expectancy")
+# hle <- opendatascot:::ods_query_database(endpoint, hle_query) %>%
+#   mutate("  " = "Healthy Life Expectancy",
+#          period = as.numeric(gsub("-.*", "", period)))
 
 # Join static healthy life expectancy data to API datset 
     # Statistics.gov.scot only has > 2015 - 2016
@@ -159,12 +160,13 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
          ) %>%
   mutate("  " = "Healthy Life Expectancy",
          value = round(value, digits = 2),
-         sex = gsub('s', '', sex)) %>% 
+         sex = gsub('s', '', sex),
+         age = "",
+         period = as.numeric(gsub("-.*", "", period)))# %>% 
   # Remove any dates that are already in stats.gov.scot dataset
-  filter(!(period %in% hle$period)) %>% 
-  rbind(hle) %>% 
-  mutate(age = "",
-         period = as.numeric(gsub("-.*", "", period)))
+ # filter(!(period %in% hle$period)) %>% 
+ # rbind(hle) %>% 
+  
 
 ## ---------------------------------------------------------------
 ##               Population Change - Data Zones               --
@@ -355,7 +357,18 @@ combined_datasets <- pop_structure %>%
         net_within_scotland,
         pop_change_by_council_area,
         pop_change_by_data_zone,
-        natural_change)
+        natural_change) 
 
 
-
+scotland_arrows <- combined_datasets %>%
+  filter(area == "Scotland") %>%
+  group_by(`  `, ` `) %>%
+  arrange(desc(period)) %>%
+  slice_max(period, n = 2) %>%
+  mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
+  filter(!is.na(change)) %>%
+  mutate(`   ` = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
+                         ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
+                                as.character(icon("minus", lib = "glyphicon"))))) %>%
+  ungroup() %>%
+  select(` `, `   `)
