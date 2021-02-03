@@ -26,6 +26,32 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
 
+    council1_arrows <- combined_datasets %>%
+      filter(area %in% council1) %>%
+      group_by(indicator, variable) %>%
+      arrange(desc(period)) %>%
+      slice_max(period, n = 2) %>%
+      mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
+      filter(!is.na(change)) %>%
+      mutate(arrow1 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
+                            ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
+                                   as.character(icon("minus", lib = "glyphicon"))))) %>%
+      ungroup() %>%
+      select(variable, arrow1)
+    
+    council2_arrows <- combined_datasets %>%
+      filter(area %in% council2) %>%
+      group_by(indicator, variable) %>%
+      arrange(desc(period)) %>%
+      slice_max(period, n = 2) %>%
+      mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
+      filter(!is.na(change)) %>%
+      mutate(arrow2 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
+                            ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
+                                   as.character(icon("minus", lib = "glyphicon"))))) %>%
+      ungroup() %>%
+      select(variable, arrow2)
+    
     combined_datasets %>%
       filter(area == "Scotland") %>%
        arrange(period) %>%
@@ -87,10 +113,16 @@ server <- function(input, output, session) {
       arrange(match(indicator, Indicator_order)) %>%
       left_join(scotland_arrows) %>%
       relocate(arrow, .after = Scotland) %>% 
+      left_join(council1_arrows) %>%
+      relocate(arrow1, .after = 5) %>% 
+      left_join(council2_arrows) %>%
+      relocate(arrow2, .after = 7) %>% 
       # Hide column names
       rename(" " = indicator,
              "  " = variable,
-             "   " = arrow)
+             "   " = arrow,
+             "    " = arrow1,
+             "     " = arrow2)
 })
 
 ##################################################################
@@ -110,17 +142,13 @@ server <- function(input, output, session) {
         rowsGroup = list(0),
         drawCallback =  cb,
         columnDefs = list(
-          list(
+          list( # 
           className = 'dt-center',
-          width = '100',
-          targets = c(4, 5)),
-          list(
+          width = '80',
+          targets = c(2, 4, 6)),
+          list( # 
             className = 'dt-left',
-            width = '1',
-            targets = 3),
-          list(
-            className = 'dt-right',
-            targets = 2)),
+            targets = c(3, 5, 7))),
         dom = 'ft',
         lengthChange = FALSE,
         bInfo = FALSE,
