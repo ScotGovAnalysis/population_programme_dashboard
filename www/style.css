@@ -1,1 +1,4 @@
-.tabbable > .nav > li > a {background-color: aqua;  color:black; width: 300PX;}
+   a:focus {
+       background-color: #fdd522;
+       outline: 2px solid #fdd522;
+   }
