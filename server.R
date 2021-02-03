@@ -15,25 +15,23 @@ server <- function(input, output, session) {
     )
   })
   
-  cb <- htmlwidgets::JS('function(){debugger;HTMLWidgets.staticRender();}')
-  
 #################################################################
 ##                      Reactive Datasets                      ##
 #################################################################
 
-
 # All other datasets -------------------------------------------
 
   combined_datasets_reactive <- reactive({
-    
+
     council1 <- input$council_1
     council2 <- input$council_2
-    
+
     combined_datasets %>%
       filter(area == "Scotland") %>%
        arrange(period) %>%
       group_by(`  `, ` `) %>%
       summarise(
+        # Sparkline for Scotland
         "Scotland" = spk_chr(
           values = c(value),
           type = "line",
@@ -43,21 +41,17 @@ server <- function(input, output, session) {
           spotColor = "#92208f",
           minSpotColor = "#92208f",
           maxSpotColor = "#92208f",
-          lineWidth = 4,
-          spotRadius = 3,
+          lineWidth = 2,
+          spotRadius = 2,
           tooltipFormat = '{{x}}: {{y}}'
-        )
-      ) %>%
+        )) %>%
       left_join(
         combined_datasets %>%
           filter(area %in% council1) %>%
            arrange(period) %>%
           group_by(`  `, ` `) %>%
-          summarise({
-            {
-              council1
-            }
-          } := spk_chr(
+          # Sparkline for Council area input 1
+          summarise({{council1}} := spk_chr(
             c(value),
             xvalues = period,
             fillColor = F,
@@ -65,16 +59,18 @@ server <- function(input, output, session) {
             spotColor = "#92208f",
             minSpotColor = "#92208f",
             maxSpotColor = "#92208f",
-            lineWidth = 4,
-            spotRadius = 3,
+            lineWidth = 2,
+            spotRadius = 2,
             tooltipFormat = '{{x}}: {{y}}'
-          ))
+          )
+          )
       ) %>%
       left_join(
         combined_datasets %>%
           filter(area %in% council2) %>%
            arrange(period) %>%
           group_by(`  `, ` `) %>%
+          # Sparkline for Council area input 2
           summarise({{council2}} := spk_chr(
             c(value),
             xvalues = period,
@@ -83,15 +79,15 @@ server <- function(input, output, session) {
             spotColor = "#92208f",
             minSpotColor = "#92208f",
             maxSpotColor = "#92208f",
-            lineWidth = 4,
-            spotRadius = 3,
+            lineWidth = 2,
+            spotRadius = 2,
             tooltipFormat = '{{x}}: {{y}}'
           ))
       ) %>%
-      arrange(match(`  `, Indicator_order))
+      arrange(match(`  `, Indicator_order)) %>%
+      left_join(scotland_arrows) %>%
+      relocate(`   `, .after = Scotland) 
 })
-
-
 
 ##################################################################
 ##                            Tables                            ##
@@ -100,19 +96,27 @@ server <- function(input, output, session) {
 
   output$table1 <- renderDataTable({
     
-    dtable <- datatable(
-      combined_datasets_reactive(),
+    cb <- htmlwidgets::JS('function(){debugger;HTMLWidgets.staticRender();}')
+    
+    dtable <- datatable(combined_datasets_reactive(),
       escape = FALSE,
       class = 'row-border',
       rownames = FALSE,
       options = list(
         rowsGroup = list(0),
         drawCallback =  cb,
-        columnDefs = list(list(
+        columnDefs = list(
+          list(
           className = 'dt-center',
           width = '100',
-          targets = 2:4
-        )),
+          targets = c(4, 5)),
+          list(
+            className = 'dt-left',
+            width = '1',
+            targets = 3),
+          list(
+            className = 'dt-right',
+            targets = 2)),
         dom = 'ft',
         lengthChange = FALSE,
         bInfo = FALSE,
@@ -120,16 +124,16 @@ server <- function(input, output, session) {
         bSort = FALSE,
         bFilter = FALSE
       ))
-    
-    # Merge the Indicators column
-    # https://stackoverflow.com/questions/39484118/shiny-merge-cells-in-dtdatatable
+
+   # Merge the Indicators column
+   # https://stackoverflow.com/questions/39484118/shiny-merge-cells-in-dtdatatable
     dep <- htmltools::htmlDependency(
-      "RowsGroup", "2.0.0", 
+      "RowsGroup", "2.0.0",
       "www/", script = "dataTables.rowsGroup.js")
-    
+
     dtable$dependencies <- c(dtable$dependencies, list(dep))
     dtable
-    
+
   })
 
 
@@ -213,4 +217,5 @@ population decline:
             culpa qui officia deserunt mollit anim id est laborum."
     )
   )
+  
 }
