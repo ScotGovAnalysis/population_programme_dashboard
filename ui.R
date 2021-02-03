@@ -3,8 +3,9 @@
 ##                              UI                              ##
 ##################################################################
 
-ui <- basicPage(
-
+ui <- fluidPage(
+  
+  # Colour indicator arrows
   tags$style(".glyphicon-arrow-down {color:#e4030c}"),
   tags$style(".glyphicon-arrow-up {color:#2da197}"),
   
