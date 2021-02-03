@@ -29,7 +29,7 @@ server <- function(input, output, session) {
     combined_datasets %>%
       filter(area == "Scotland") %>%
        arrange(period) %>%
-      group_by(`  `, ` `) %>%
+      group_by(indicator, variable) %>%
       summarise(
         # Sparkline for Scotland
         "Scotland" = spk_chr(
@@ -49,7 +49,7 @@ server <- function(input, output, session) {
         combined_datasets %>%
           filter(area %in% council1) %>%
            arrange(period) %>%
-          group_by(`  `, ` `) %>%
+          group_by(indicator, variable) %>%
           # Sparkline for Council area input 1
           summarise({{council1}} := spk_chr(
             c(value),
@@ -69,7 +69,7 @@ server <- function(input, output, session) {
         combined_datasets %>%
           filter(area %in% council2) %>%
            arrange(period) %>%
-          group_by(`  `, ` `) %>%
+          group_by(indicator, variable) %>%
           # Sparkline for Council area input 2
           summarise({{council2}} := spk_chr(
             c(value),
@@ -84,9 +84,13 @@ server <- function(input, output, session) {
             tooltipFormat = '{{x}}: {{y}}'
           ))
       ) %>%
-      arrange(match(`  `, Indicator_order)) %>%
+      arrange(match(indicator, Indicator_order)) %>%
       left_join(scotland_arrows) %>%
-      relocate(`   `, .after = Scotland) 
+      relocate(arrow, .after = Scotland) %>% 
+      # Hide column names
+      rename(" " = indicator,
+             "  " = variable,
+             "   " = arrow)
 })
 
 ##################################################################
