@@ -3,8 +3,11 @@
 ##                              UI                              ##
 ##################################################################
 
-ui <- fluidPage(
+ui <- basicPage(
 
+  tags$style(".glyphicon-arrow-down {color:#e4030c}"),
+  tags$style(".glyphicon-arrow-up {color:#2da197}"),
+  
   titlePanel("Population Programme"),
   uiOutput("subheader"),
   
@@ -32,6 +35,7 @@ ui <- fluidPage(
                    selected = "Glasgow City")
                  )
                ),
+      
       htmlwidgets::getDependency('sparkline'),
       dataTableOutput("table1"),
       br(),
