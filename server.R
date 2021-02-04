@@ -4,8 +4,7 @@
 
 server <- function(input, output, session) {
   
-  
-  url <- a("Population Taskforce", href = "https://www.google.com/")
+  url <- a("Population Taskforce", href = "https://www.gov.scot/groups/population-task-force/", target="_blank")
   
   output$subheader <- renderUI({
     tagList(
@@ -63,12 +62,13 @@ server <- function(input, output, session) {
           type = "line",
           xvalues = period,
           fillColor = F,
-          lineColor = "#2DA197",
-          spotColor = "#92208f",
-          minSpotColor = "#92208f",
-          maxSpotColor = "#92208f",
+          lineColor = "#0065bd",
+          spotColor = "#0065bd",
+          highlightSpotColor = "#fdd522",
+          minSpotColor = "#0065bd",
+          maxSpotColor = "#0065bd",
           lineWidth = 2,
-          spotRadius = 2,
+          spotRadius = 3,
           tooltipFormat = '{{x}}: {{y}}'
         )) %>%
       left_join(
@@ -81,12 +81,13 @@ server <- function(input, output, session) {
             c(value),
             xvalues = period,
             fillColor = F,
-            lineColor = "#2DA197",
-            spotColor = "#92208f",
-            minSpotColor = "#92208f",
-            maxSpotColor = "#92208f",
+            lineColor = "#0065bd",
+            spotColor = "#0065bd",
+            highlightSpotColor = "#fdd522",
+            minSpotColor = "#0065bd",
+            maxSpotColor = "#0065bd",
             lineWidth = 2,
-            spotRadius = 2,
+            spotRadius = 3,
             tooltipFormat = '{{x}}: {{y}}'
           )
           )
@@ -101,12 +102,13 @@ server <- function(input, output, session) {
             c(value),
             xvalues = period,
             fillColor = F,
-            lineColor = "#2DA197",
-            spotColor = "#92208f",
-            minSpotColor = "#92208f",
-            maxSpotColor = "#92208f",
+            lineColor = "#0065bd",
+            spotColor = "#0065bd",
+            highlightSpotColor = "#fdd522",
+            minSpotColor = "#0065bd",
+            maxSpotColor = "#0065bd",
             lineWidth = 2,
-            spotRadius = 2,
+            spotRadius = 3,
             tooltipFormat = '{{x}}: {{y}}'
           ))
       ) %>%
@@ -142,12 +144,13 @@ server <- function(input, output, session) {
         rowsGroup = list(0),
         drawCallback =  cb,
         columnDefs = list(
-          list( # 
+          list( # sparkline columns
           className = 'dt-center',
-          width = '80',
+          width = '100',
           targets = c(2, 4, 6)),
-          list( # 
+          list( # arrow columns
             className = 'dt-left',
+            width = '1',
             targets = c(3, 5, 7))),
         dom = 'ft',
         lengthChange = FALSE,
