@@ -5,11 +5,11 @@
 
 ui <- fluidPage(
   
-  # Colour indicator arrows
-  tags$style(".glyphicon-arrow-down {color:#e4030c}"),
-  tags$style(".glyphicon-arrow-up {color:#2da197}"),
-  
-  titlePanel("Population Programme"),
+   includeCSS("www/style.css"),
+
+  titlePanel(title=div(img(src="saltire_logo.PNG", 
+                           height = 50), br(), br(),
+                       "Population Programme")),
   uiOutput("subheader"),
   
   br(),
@@ -25,14 +25,14 @@ ui <- fluidPage(
                  selectInput(
                    "council_1",
                    label = "Select Council Area",
-                   choices = area_name_lookup$area,
+                   choices = council_areas$area,
                    selected = "City of Edinburgh")),
 
                column(3,
                  selectInput(
                    "council_2",
                    label = "Select Council Area",
-                   choices = area_name_lookup$area,
+                   choices = council_areas$area,
                    selected = "Glasgow City")
                  )
                ),
