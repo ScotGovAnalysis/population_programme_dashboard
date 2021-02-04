@@ -29,6 +29,7 @@ file_path_ruk <- "data/mig-uk-admin-sex-91-latest-tab2.xlsx"
 file_path_natural_change <- "data/Natural change - 2009-2019.xlsx"
 # Area name lookups
 area_name_lookup <- read.csv("data/area_codes.csv")
+council_areas <- area_name_lookup %>% filter(area != "Scotland")
 data_zone_lookup <- read.csv("data/Datazone2011lookup.csv")
 
 # Assign endpoint for SPARQL queries
