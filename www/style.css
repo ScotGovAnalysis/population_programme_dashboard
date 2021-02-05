@@ -1,4 +1,7 @@
-   a:focus {
-       background-color: #fdd522;
-       outline: 2px solid #fdd522;
-   }
+button:focus,
+a:focus {
+    background-color: #fdd522 !important;
+    color: #333333 !important;
+    outline-offset: 0;
+    transition-duration: 0s;
+}
