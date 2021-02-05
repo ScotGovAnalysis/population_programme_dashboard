@@ -4,7 +4,9 @@
 
 server <- function(input, output, session) {
   
-  url <- a("Population Taskforce", href = "https://www.gov.scot/groups/population-task-force/", target="_blank")
+  url <- a("Population Taskforce", 
+           href = "https://www.gov.scot/groups/population-task-force/", 
+           target="_blank")
   
   output$subheader <- renderUI({
     tagList(
@@ -18,13 +20,238 @@ server <- function(input, output, session) {
 ##                      Reactive Datasets                      ##
 #################################################################
 
-# All other datasets -------------------------------------------
 
-  combined_datasets_reactive <- reactive({
+# Migration ---------------------------------------------------------------
+  migration_reactive <- reactive({
+    
+    council1 <- input$council_1
+    council2 <- input$council_2
+    
+    scotland_arrows <- migration_datasets %>%
+      filter(area == "Scotland") %>%
+      group_by(indicator, variable) %>%
+      arrange(desc(period)) %>%
+      filter(!is.na(value)) %>% 
+      slice_max(period, n = 2) %>%
+      mutate(change = ifelse(value - lag(value) > 0, 1, ifelse(value - lag(value) < 0, 2, 0))) %>%
+      filter(!is.na(change)) %>%
+      mutate(arrow = ifelse(
+        change == 1,
+        as.character(icon("arrow-down", 
+                          lib = "glyphicon")),
+        ifelse(change == 2, 
+               as.character(icon("arrow-up", 
+                                 lib = "glyphicon")),
+               as.character(icon("minus", 
+                                 lib = "glyphicon"))))) %>%
+      ungroup() %>%
+      select(variable, arrow)
+    
+    council1_arrows <- migration_datasets %>%
+      filter(area %in% council1) %>%
+      group_by(indicator, variable) %>%
+      arrange(desc(period)) %>%
+      filter(!is.na(value)) %>% 
+      slice_max(period, n = 2) %>%
+      mutate(change = ifelse(value-lag(value) > 0, 1, 
+                             ifelse(value-lag(value) < 0, 2, 0))) %>%
+      filter(!is.na(change)) %>%
+      mutate(arrow1 = ifelse(change == 1, 
+                             as.character(icon("arrow-down", 
+                                               lib = "glyphicon")),
+                             ifelse(change == 2, 
+                                    as.character(icon("arrow-up", 
+                                                      lib = "glyphicon")), 
+                                    as.character(icon("minus", 
+                                                      lib = "glyphicon"))))) %>%
+      ungroup() %>%
+      select(variable, arrow1)
+    
+    council2_arrows <- migration_datasets %>%
+      filter(area %in% council2) %>%
+      group_by(indicator, variable) %>%
+      arrange(desc(period)) %>%
+      filter(!is.na(value)) %>% 
+      slice_max(period, n = 2) %>%
+      mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
+      filter(!is.na(change)) %>%
+      mutate(arrow2 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
+                             ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
+                                    as.character(icon("minus", lib = "glyphicon"))))) %>%
+      ungroup() %>%
+      select(variable, arrow2)
+    
+    migration_datasets %>%
+      filter(area == "Scotland") %>%
+      arrange(period) %>%
+      group_by(indicator, variable) %>%
+      summarise(
+        # Sparkline for Scotland
+        "Scotland" = sparkline_format(value, 
+                                      period)
+      ) %>%
+      left_join(
+        migration_datasets %>%
+          filter(area %in% council1) %>%
+          arrange(period) %>%
+          group_by(indicator, variable) %>%
+          # Sparkline for Council area input 1
+          summarise({{council1}} := sparkline_format(value, 
+                                                     period))) %>%
+      left_join(
+        migration_datasets %>%
+          filter(area %in% council2) %>%
+          arrange(period) %>%
+          group_by(indicator, variable) %>%
+          # Sparkline for Council area input 2
+          summarise({{council2}} := sparkline_format(value, 
+                                                     period))
+      ) %>%
+      arrange(match(indicator, Indicator_order)) %>%
+      left_join(scotland_arrows) %>%
+      relocate(arrow, .after = Scotland) %>% 
+      left_join(council1_arrows) %>%
+      relocate(arrow1, .after = 5) %>% 
+      left_join(council2_arrows) %>%
+      relocate(arrow2, .after = 7) %>% 
+      # Hide column names
+      rename("     " = indicator,
+             "    " = variable,
+             "   " = arrow,
+             "  " = arrow1,
+             " " = arrow2)
+  })
+
+  
+
+# Healthy Life Expectancy -------------------------------------------------
+
+
+
+  healthy_life_expectancy_reactive <- reactive({
 
     council1 <- input$council_1
     council2 <- input$council_2
 
+    scotland_arrows <- healthy_life_expectancy %>%
+      filter(area == "Scotland") %>%
+      group_by(indicator, variable) %>%
+      arrange(desc(period)) %>%
+      filter(!is.na(value)) %>% 
+      slice_max(period, n = 2) %>%
+      mutate(change = ifelse(value - lag(value) > 0, 1, ifelse(value - lag(value) < 0, 2, 0))) %>%
+      filter(!is.na(change)) %>%
+      mutate(arrow = ifelse(
+        change == 1,
+        as.character(icon("arrow-down", 
+                          lib = "glyphicon")),
+        ifelse(change == 2, 
+               as.character(icon("arrow-up", 
+                                 lib = "glyphicon")),
+               as.character(icon("minus", 
+                                 lib = "glyphicon"))))) %>%
+      ungroup() %>%
+      select(variable, arrow)
+    
+    council1_arrows <- healthy_life_expectancy %>%
+      filter(area %in% council1) %>%
+      group_by(indicator, variable) %>%
+      arrange(desc(period)) %>%
+      filter(!is.na(value)) %>% 
+      slice_max(period, n = 2) %>%
+      mutate(change = ifelse(value-lag(value) > 0, 1, 
+                             ifelse(value-lag(value) < 0, 2, 0))) %>%
+      filter(!is.na(change)) %>%
+      mutate(arrow1 = ifelse(change == 1, 
+                             as.character(icon("arrow-down", 
+                                               lib = "glyphicon")),
+                            ifelse(change == 2, 
+                                   as.character(icon("arrow-up", 
+                                                     lib = "glyphicon")), 
+                                   as.character(icon("minus", 
+                                                     lib = "glyphicon"))))) %>%
+      ungroup() %>%
+      select(variable, arrow1)
+    
+    council2_arrows <- healthy_life_expectancy %>%
+      filter(area %in% council2) %>%
+      group_by(indicator, variable) %>%
+      arrange(desc(period)) %>%
+      filter(!is.na(value)) %>% 
+      slice_max(period, n = 2) %>%
+      mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
+      filter(!is.na(change)) %>%
+      mutate(arrow2 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
+                            ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
+                                   as.character(icon("minus", lib = "glyphicon"))))) %>%
+      ungroup() %>%
+      select(variable, arrow2)
+    
+    healthy_life_expectancy %>%
+      filter(area == "Scotland") %>%
+       arrange(period) %>%
+      group_by(indicator, variable) %>%
+      summarise(
+        # Sparkline for Scotland
+        "Scotland" = sparkline_format(value, period)
+        ) %>%
+      left_join(
+        healthy_life_expectancy %>%
+          filter(area %in% council1) %>%
+           arrange(period) %>%
+          group_by(indicator, variable) %>%
+          # Sparkline for Council area input 1
+          summarise({{council1}} := sparkline_format(value, 
+                                                     period))) %>%
+      left_join(
+        healthy_life_expectancy %>%
+          filter(area %in% council2) %>%
+           arrange(period) %>%
+          group_by(indicator, variable) %>%
+          # Sparkline for Council area input 2
+          summarise({{council2}} := sparkline_format(value, period))
+      ) %>%
+      arrange(match(indicator, Indicator_order)) %>%
+      left_join(scotland_arrows) %>%
+      relocate(arrow, .after = Scotland) %>% 
+      left_join(council1_arrows) %>%
+      relocate(arrow1, .after = 5) %>% 
+      left_join(council2_arrows) %>%
+      relocate(arrow2, .after = 7) %>% 
+      # Hide column names
+      rename("     " = indicator,
+             "    " = variable,
+             "   " = arrow,
+             "  " = arrow1,
+             " " = arrow2)
+})
+  
+  # All other datasets -------------------------------------------
+  
+  combined_datasets_reactive <- reactive({
+    
+    council1 <- input$council_1
+    council2 <- input$council_2
+    
+    scotland_arrows <- combined_datasets %>%
+      filter(area == "Scotland") %>%
+      group_by(indicator, variable) %>%
+      arrange(desc(period)) %>%
+      slice_max(period, n = 2) %>%
+      mutate(change = ifelse(value - lag(value) > 0, 1, ifelse(value - lag(value) < 0, 2, 0))) %>%
+      filter(!is.na(change)) %>%
+      mutate(arrow = ifelse(
+        change == 1,
+        as.character(icon("arrow-down", 
+                          lib = "glyphicon")),
+        ifelse(change == 2, 
+               as.character(icon("arrow-up", 
+                                 lib = "glyphicon")),
+               as.character(icon("minus", 
+                                 lib = "glyphicon"))))) %>%
+      ungroup() %>%
+      select(variable, arrow)
+    
     council1_arrows <- combined_datasets %>%
       filter(area %in% council1) %>%
       group_by(indicator, variable) %>%
@@ -33,8 +260,8 @@ server <- function(input, output, session) {
       mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
       filter(!is.na(change)) %>%
       mutate(arrow1 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
-                            ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
-                                   as.character(icon("minus", lib = "glyphicon"))))) %>%
+                             ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
+                                    as.character(icon("minus", lib = "glyphicon"))))) %>%
       ungroup() %>%
       select(variable, arrow1)
     
@@ -46,71 +273,34 @@ server <- function(input, output, session) {
       mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
       filter(!is.na(change)) %>%
       mutate(arrow2 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
-                            ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
-                                   as.character(icon("minus", lib = "glyphicon"))))) %>%
+                             ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
+                                    as.character(icon("minus", lib = "glyphicon"))))) %>%
       ungroup() %>%
       select(variable, arrow2)
     
     combined_datasets %>%
       filter(area == "Scotland") %>%
-       arrange(period) %>%
+      arrange(period) %>%
       group_by(indicator, variable) %>%
       summarise(
         # Sparkline for Scotland
-        "Scotland" = spk_chr(
-          values = c(value),
-          type = "line",
-          xvalues = period,
-          fillColor = F,
-          lineColor = "#0065bd",
-          spotColor = "#0065bd",
-          highlightSpotColor = "#fdd522",
-          minSpotColor = "#0065bd",
-          maxSpotColor = "#0065bd",
-          lineWidth = 2,
-          spotRadius = 3,
-          tooltipFormat = '{{x}}: {{y}}'
-        )) %>%
-      left_join(
-        combined_datasets %>%
-          filter(area %in% council1) %>%
-           arrange(period) %>%
-          group_by(indicator, variable) %>%
-          # Sparkline for Council area input 1
-          summarise({{council1}} := spk_chr(
-            c(value),
-            xvalues = period,
-            fillColor = F,
-            lineColor = "#0065bd",
-            spotColor = "#0065bd",
-            highlightSpotColor = "#fdd522",
-            minSpotColor = "#0065bd",
-            maxSpotColor = "#0065bd",
-            lineWidth = 2,
-            spotRadius = 3,
-            tooltipFormat = '{{x}}: {{y}}'
-          )
-          )
+        "Scotland" = sparkline_format(value, period)
       ) %>%
       left_join(
         combined_datasets %>%
+          filter(area %in% council1) %>%
+          arrange(period) %>%
+          group_by(indicator, variable) %>%
+          # Sparkline for Council area input 1
+          summarise({{council1}} := sparkline_format(value, 
+                                                     period))) %>%
+      left_join(
+        combined_datasets %>%
           filter(area %in% council2) %>%
-           arrange(period) %>%
+          arrange(period) %>%
           group_by(indicator, variable) %>%
           # Sparkline for Council area input 2
-          summarise({{council2}} := spk_chr(
-            c(value),
-            xvalues = period,
-            fillColor = F,
-            lineColor = "#0065bd",
-            spotColor = "#0065bd",
-            highlightSpotColor = "#fdd522",
-            minSpotColor = "#0065bd",
-            maxSpotColor = "#0065bd",
-            lineWidth = 2,
-            spotRadius = 3,
-            tooltipFormat = '{{x}}: {{y}}'
-          ))
+          summarise({{council2}} := sparkline_format(value, period))
       ) %>%
       arrange(match(indicator, Indicator_order)) %>%
       left_join(scotland_arrows) %>%
@@ -120,12 +310,12 @@ server <- function(input, output, session) {
       left_join(council2_arrows) %>%
       relocate(arrow2, .after = 7) %>% 
       # Hide column names
-      rename(" " = indicator,
-             "  " = variable,
+      rename("     " = indicator,
+             "    " = variable,
              "   " = arrow,
-             "    " = arrow1,
-             "     " = arrow2)
-})
+             "  " = arrow1,
+             " " = arrow2)
+  })
 
 ##################################################################
 ##                            Tables                            ##
@@ -136,7 +326,9 @@ server <- function(input, output, session) {
     
     cb <- htmlwidgets::JS('function(){debugger;HTMLWidgets.staticRender();}')
     
-    dtable <- datatable(combined_datasets_reactive(),
+    dtable <- datatable(combined_datasets_reactive() %>% 
+                          rbind(healthy_life_expectancy_reactive(),
+                                migration_reactive()),
       escape = FALSE,
       class = 'row-border',
       rownames = FALSE,
@@ -145,7 +337,7 @@ server <- function(input, output, session) {
         drawCallback =  cb,
         columnDefs = list(
           list( # sparkline columns
-          className = 'dt-center',
+          className = 'dt-right',
           width = '100',
           targets = c(2, 4, 6)),
           list( # arrow columns
