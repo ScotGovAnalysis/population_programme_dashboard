@@ -16,8 +16,8 @@ library(DT)
 # Read in static data files
 
 #Healthy life expectancy
-# This file has been modified to ad NA's to all the years with 
-# missing values for the coucnil areas
+# This file has been modified to add NA's to all the years with 
+# missing values for the council areas
 file_path_hle <- "data/HLE.xlsx"
 # Net Migration within Scotland
 file_path_net_with_scot <- "data/migflow-ca-01-latest-tab1.xlsx"
@@ -58,6 +58,7 @@ Indicator_order <- c("Population Structure",
                      "Net within Scotland")
 
 source("SPARQL_queries.R")
+source("functions.R")
 ##################################################################
 ##                       Reading Raw Data                       ##
 ##################################################################
@@ -342,28 +343,19 @@ natural_change <- readxl::read_excel(file_path_natural_change) %>%
 combined_datasets <- pop_structure %>% 
   filter(age != "All",
          period >= (current_year - 12)) %>% 
-  rbind(adr,
-        healthy_life_expectancy) %>% 
+  rbind(adr) %>% 
   mutate("variable" = paste(age, sex)) %>% 
   select(-c(age, sex)) %>%
-  rbind(net_ruk,
-        total_net_migration,
-        net_overseas,
-        net_within_scotland,
-        pop_change_by_council_area,
+  rbind(pop_change_by_council_area,
         pop_change_by_data_zone,
-        natural_change) 
+        natural_change)
+
+healthy_life_expectancy <- healthy_life_expectancy %>% 
+  mutate("variable" = paste(age, sex)) %>% 
+  select(-c(age, sex))
 
 
-scotland_arrows <- combined_datasets %>%
-  filter(area == "Scotland") %>%
-  group_by(indicator, variable) %>%
-  arrange(desc(period)) %>%
-  slice_max(period, n = 2) %>%
-  mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
-  filter(!is.na(change)) %>%
-  mutate(arrow = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
-                         ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
-                                as.character(icon("minus", lib = "glyphicon"))))) %>%
-  ungroup() %>%
-  select(variable, arrow)
+migration_datasets <-  net_ruk %>%
+  rbind(total_net_migration,
+        net_overseas,
+        net_within_scotland)
