@@ -5,11 +5,17 @@
 
 ui <- fluidPage(
   
-   includeCSS("www/style.css"),
+  includeCSS("www/style.css"),
 
-  titlePanel(title=div(img(src="saltire_logo.PNG", 
-                           height = 50), br(), br(),
-                       "Population Programme")),
+  titlePanel(title = div(tagList(a(img(src = "saltire_logo.PNG", 
+                           height = 50),
+                           href = "https://www.gov.scot/", 
+                           target="_blank")), 
+                         br(),
+                         br(),
+             "Population Programme"), 
+             windowTitle = "Population Programme"),
+  
   uiOutput("subheader"),
   
   br(),
@@ -39,6 +45,7 @@ ui <- fluidPage(
       
       htmlwidgets::getDependency('sparkline'),
       dataTableOutput("table1"),
+    #  dataTableOutput("table2"),
       br(),
       br()
     ),
