@@ -25,6 +25,7 @@ ui <- fluidPage(
 
     tabPanel(
       "Indicators",
+      br(),
       fluidRow(column(6),
 
                column(3,
