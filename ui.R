@@ -1,11 +1,11 @@
-includeCSS("www/style.css")
-# tags$style("")
-# tags$style("")
-ui <- navbarPage(tagList(a(img(src = "saltire_logo.PNG",
+
+ui <- navbarPage(tagList(a(img(src = "scotgovlogo.svg",
                                height = 30),
                            href = "https://www.gov.scot/",
                            target="_blank")),
                  
+                 # Sourcing ustom CSS ----
+                 #tags$head(includeCSS("www/style.css")),
                  
                  windowTitle = "Population Programme",
                  tabPanel("Indicators",
