@@ -15,73 +15,47 @@ server <- function(input, output, session) {
       "to understand the demographic challenges in Scotland."
     )
   })
+  output$subheader1 <- renderUI({
+    tagList(
+      "This dashboard supports the",
+      url,
+      "to understand the demographic challenges in Scotland."
+    )
+  })
+  output$subheader2 <- renderUI({
+    tagList(
+      "This dashboard supports the",
+      url,
+      "to understand the demographic challenges in Scotland."
+    )
+  })
   
 #################################################################
 ##                      Reactive Datasets                      ##
 #################################################################
 
+# Population Structure ----------------------------------------------------
 
-# Migration ---------------------------------------------------------------
-  migration_reactive <- reactive({
+  pop_structure_reactive <- reactive({
     
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_arrows <- migration_datasets %>%
-      filter(area == "Scotland") %>%
-      group_by(indicator, variable) %>%
-      arrange(desc(period)) %>%
-      filter(!is.na(value)) %>% 
-      slice_max(period, n = 2) %>%
-      mutate(change = ifelse(value - lag(value) > 0, 1, ifelse(value - lag(value) < 0, 2, 0))) %>%
-      filter(!is.na(change)) %>%
-      mutate(arrow = ifelse(
-        change == 1,
-        as.character(icon("arrow-down", 
-                          lib = "glyphicon")),
-        ifelse(change == 2, 
-               as.character(icon("arrow-up", 
-                                 lib = "glyphicon")),
-               as.character(icon("minus", 
-                                 lib = "glyphicon"))))) %>%
-      ungroup() %>%
-      select(variable, arrow)
+    scotland_arrows <- create_symbols_scotland(pop_structure,
+                                               "arrow-up",
+                                               "arrow-down")
     
-    council1_arrows <- migration_datasets %>%
-      filter(area %in% council1) %>%
-      group_by(indicator, variable) %>%
-      arrange(desc(period)) %>%
-      filter(!is.na(value)) %>% 
-      slice_max(period, n = 2) %>%
-      mutate(change = ifelse(value-lag(value) > 0, 1, 
-                             ifelse(value-lag(value) < 0, 2, 0))) %>%
-      filter(!is.na(change)) %>%
-      mutate(arrow1 = ifelse(change == 1, 
-                             as.character(icon("arrow-down", 
-                                               lib = "glyphicon")),
-                             ifelse(change == 2, 
-                                    as.character(icon("arrow-up", 
-                                                      lib = "glyphicon")), 
-                                    as.character(icon("minus", 
-                                                      lib = "glyphicon"))))) %>%
-      ungroup() %>%
-      select(variable, arrow1)
+    council1_arrows <- create_symbols_council1(pop_structure,
+                                               council1,
+                                               "arrow-up",
+                                               "arrow-down")
     
-    council2_arrows <- migration_datasets %>%
-      filter(area %in% council2) %>%
-      group_by(indicator, variable) %>%
-      arrange(desc(period)) %>%
-      filter(!is.na(value)) %>% 
-      slice_max(period, n = 2) %>%
-      mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
-      filter(!is.na(change)) %>%
-      mutate(arrow2 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
-                             ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
-                                    as.character(icon("minus", lib = "glyphicon"))))) %>%
-      ungroup() %>%
-      select(variable, arrow2)
+    council2_arrows <- create_symbols_council2(pop_structure,
+                                               council2,
+                                               "arrow-up",
+                                               "arrow-down")
     
-    migration_datasets %>%
+    pop_structure %>%
       filter(area == "Scotland") %>%
       arrange(period) %>%
       group_by(indicator, variable) %>%
@@ -91,7 +65,7 @@ server <- function(input, output, session) {
                                       period)
       ) %>%
       left_join(
-        migration_datasets %>%
+        pop_structure %>%
           filter(area %in% council1) %>%
           arrange(period) %>%
           group_by(indicator, variable) %>%
@@ -99,7 +73,7 @@ server <- function(input, output, session) {
           summarise({{council1}} := sparkline_format(value, 
                                                      period))) %>%
       left_join(
-        migration_datasets %>%
+        pop_structure %>%
           filter(area %in% council2) %>%
           arrange(period) %>%
           group_by(indicator, variable) %>%
@@ -107,7 +81,70 @@ server <- function(input, output, session) {
           summarise({{council2}} := sparkline_format(value, 
                                                      period))
       ) %>%
-      arrange(match(indicator, Indicator_order)) %>%
+      arrange(match(indicator, Indicator_order),
+              match(variable, variable_order)) %>%
+      left_join(scotland_arrows) %>%
+      relocate(arrow, .after = Scotland) %>% 
+      left_join(council1_arrows) %>%
+      relocate(arrow1, .after = 5) %>% 
+      left_join(council2_arrows) %>%
+      relocate(arrow2, .after = 7) %>% 
+      # Hide column names
+      rename("     " = indicator,
+             "    " = variable,
+             "   " = arrow,
+             "  " = arrow1,
+             " " = arrow2)
+  })
+
+# Migration ---------------------------------------------------------------
+  migration_reactive <- reactive({
+    
+    council1 <- input$council_1
+    council2 <- input$council_2
+    
+    scotland_arrows <- create_symbols_scotland(migration_datasets,
+                                               "thumbs-down",
+                                               "thumbs-up")
+    
+    council1_arrows <- create_symbols_council1(migration_datasets,
+                                               council1,
+                                               "thumbs-up",
+                                               "thumbs-down")
+    
+    council2_arrows <- create_symbols_council2(migration_datasets,
+                                               council2,
+                                               "thumbs-up",
+                                               "thumbs-down")
+    
+    migration_datasets %>%
+      filter(area == "Scotland") %>%
+      arrange(period) %>%
+      group_by(indicator, variable) %>%
+      summarise(
+        # Sparkline for Scotland
+        "Scotland" = sparkbar_format(value, 
+                                      period)
+      ) %>%
+      left_join(
+        migration_datasets %>%
+          filter(area %in% council1) %>%
+          arrange(period) %>%
+          group_by(indicator, variable) %>%
+          # Sparkline for Council area input 1
+          summarise({{council1}} := sparkbar_format(value, 
+                                                     period))) %>%
+      left_join(
+        migration_datasets %>%
+          filter(area %in% council2) %>%
+          arrange(period) %>%
+          group_by(indicator, variable) %>%
+          # Sparkline for Council area input 2
+          summarise({{council2}} := sparkbar_format(value, 
+                                                     period))
+      ) %>%
+      arrange(match(indicator, indicator_order),
+              match(variable, variable_order)) %>%
       left_join(scotland_arrows) %>%
       relocate(arrow, .after = Scotland) %>% 
       left_join(council1_arrows) %>%
@@ -143,10 +180,10 @@ server <- function(input, output, session) {
       filter(!is.na(change)) %>%
       mutate(arrow = ifelse(
         change == 1,
-        as.character(icon("arrow-down", 
+        as.character(icon("thumbs-down", 
                           lib = "glyphicon")),
         ifelse(change == 2, 
-               as.character(icon("arrow-up", 
+               as.character(icon("thumbs-up", 
                                  lib = "glyphicon")),
                as.character(icon("minus", 
                                  lib = "glyphicon"))))) %>%
@@ -163,10 +200,10 @@ server <- function(input, output, session) {
                              ifelse(value-lag(value) < 0, 2, 0))) %>%
       filter(!is.na(change)) %>%
       mutate(arrow1 = ifelse(change == 1, 
-                             as.character(icon("arrow-down", 
+                             as.character(icon("thumbs-down", 
                                                lib = "glyphicon")),
                             ifelse(change == 2, 
-                                   as.character(icon("arrow-up", 
+                                   as.character(icon("thumbs-up", 
                                                      lib = "glyphicon")), 
                                    as.character(icon("minus", 
                                                      lib = "glyphicon"))))) %>%
@@ -181,8 +218,8 @@ server <- function(input, output, session) {
       slice_max(period, n = 2) %>%
       mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
       filter(!is.na(change)) %>%
-      mutate(arrow2 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
-                            ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
+      mutate(arrow2 = ifelse(change == 1, as.character(icon("thumbs-down", lib = "glyphicon")),
+                            ifelse(change == 2, as.character(icon("thumbs-up", lib = "glyphicon")), 
                                    as.character(icon("minus", lib = "glyphicon"))))) %>%
       ungroup() %>%
       select(variable, arrow2)
@@ -211,7 +248,8 @@ server <- function(input, output, session) {
           # Sparkline for Council area input 2
           summarise({{council2}} := sparkline_format(value, period))
       ) %>%
-      arrange(match(indicator, Indicator_order)) %>%
+      arrange(match(indicator, indicator_order),
+              match(variable, variable_order)) %>%
       left_join(scotland_arrows) %>%
       relocate(arrow, .after = Scotland) %>% 
       left_join(council1_arrows) %>%
@@ -233,50 +271,19 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_arrows <- combined_datasets %>%
-      filter(area == "Scotland") %>%
-      group_by(indicator, variable) %>%
-      arrange(desc(period)) %>%
-      slice_max(period, n = 2) %>%
-      mutate(change = ifelse(value - lag(value) > 0, 1, ifelse(value - lag(value) < 0, 2, 0))) %>%
-      filter(!is.na(change)) %>%
-      mutate(arrow = ifelse(
-        change == 1,
-        as.character(icon("arrow-down", 
-                          lib = "glyphicon")),
-        ifelse(change == 2, 
-               as.character(icon("arrow-up", 
-                                 lib = "glyphicon")),
-               as.character(icon("minus", 
-                                 lib = "glyphicon"))))) %>%
-      ungroup() %>%
-      select(variable, arrow)
+    scotland_arrows <- create_symbols_scotland(combined_datasets,
+                                               "thumbs-up",
+                                               "thumbs-down")
     
-    council1_arrows <- combined_datasets %>%
-      filter(area %in% council1) %>%
-      group_by(indicator, variable) %>%
-      arrange(desc(period)) %>%
-      slice_max(period, n = 2) %>%
-      mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
-      filter(!is.na(change)) %>%
-      mutate(arrow1 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
-                             ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
-                                    as.character(icon("minus", lib = "glyphicon"))))) %>%
-      ungroup() %>%
-      select(variable, arrow1)
+    council1_arrows <- create_symbols_council1(combined_datasets,
+                                               council1,
+                                               "thumbs-up",
+                                               "thumbs-down")
     
-    council2_arrows <- combined_datasets %>%
-      filter(area %in% council2) %>%
-      group_by(indicator, variable) %>%
-      arrange(desc(period)) %>%
-      slice_max(period, n = 2) %>%
-      mutate(change = ifelse(value-lag(value) > 0, 1, ifelse(value-lag(value) < 0, 2, 0))) %>%
-      filter(!is.na(change)) %>%
-      mutate(arrow2 = ifelse(change == 1, as.character(icon("arrow-down", lib = "glyphicon")),
-                             ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")), 
-                                    as.character(icon("minus", lib = "glyphicon"))))) %>%
-      ungroup() %>%
-      select(variable, arrow2)
+    council2_arrows <- create_symbols_council2(combined_datasets,
+                                               council2,
+                                               "thumbs-up",
+                                               "thumbs-down")
     
     combined_datasets %>%
       filter(area == "Scotland") %>%
@@ -302,7 +309,8 @@ server <- function(input, output, session) {
           # Sparkline for Council area input 2
           summarise({{council2}} := sparkline_format(value, period))
       ) %>%
-      arrange(match(indicator, Indicator_order)) %>%
+      arrange(match(indicator, indicator_order),
+              match(variable, variable_order)) %>%
       left_join(scotland_arrows) %>%
       relocate(arrow, .after = Scotland) %>% 
       left_join(council1_arrows) %>%
@@ -326,9 +334,11 @@ server <- function(input, output, session) {
     
     cb <- htmlwidgets::JS('function(){debugger;HTMLWidgets.staticRender();}')
     
-    dtable <- datatable(combined_datasets_reactive() %>% 
+    dtable <- datatable(pop_structure_reactive() %>% 
                           rbind(healthy_life_expectancy_reactive(),
-                                migration_reactive()),
+                                combined_datasets_reactive(),
+                                migration_reactive(),
+                                ),
       escape = FALSE,
       class = 'row-border',
       rownames = FALSE,
