@@ -47,15 +47,27 @@ year_quarters <- paste0(rep(as.character(c((current_year - 12):(current_year))),
                             each = length(current_quarter)),"-",
                            current_quarter)
 
-Indicator_order <- c("Population Structure",
+indicator_order <- c("Population Structure",
                      "Active Dependency Ratio",
                      "Healthy Life Expectancy",
-                     "pop_change_by_council_area",
-                     "pop_change_by_data_zone",
-                     "Net Migration - Rest of UK",
-                     "Total Net Migration", 
-                     "Net Overseas",
-                     "Net within Scotland")
+                     "Population Change",
+                     "Net Migration")
+
+variable_order <- c("Children (under 16 years)",
+                    "Working Age (16 - 64)",
+                    "Pensionable Age (65 and over)",
+                    "",
+                    "Female",
+                    "Male",
+                    "Natural Change",
+                    "% Increased data zones",
+                    "% Decreased data zones",
+                    "Increased council areas",
+                    "Decreased council areas",
+                    "Within Scotland",
+                    "Rest of the UK",
+                    "Overseas",
+                    "Total")
 
 source("SPARQL_queries.R")
 source("functions.R")
@@ -158,7 +170,8 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
          value = round(value, digits = 2),
          sex = gsub('s', '', sex),
          age = "",
-         period = as.numeric(gsub("-.*", "", period)))# %>% 
+         period = as.numeric(gsub("-.*", "", period)))
+#%>% 
   # Remove any dates that are already in stats.gov.scot dataset
  # filter(!(period %in% hle$period)) %>% 
  # rbind(hle) %>% 
@@ -266,7 +279,7 @@ net_within_scotland <- readxl::read_excel(
 mutate(area = gsub("Total Moves within Scotland3", "Scotland", area),
        "variable" = "Within Scotland",
        "indicator" = "Net Migration",
-       period = as.numeric(gsub("-.*","",period))) %>% 
+       period = as.numeric(gsub("-.*","",period))+1) %>% 
   filter(period >= 2009)
 
 ## ----------------------------------------------------------------
@@ -287,8 +300,7 @@ net_ruk <- readxl::read_xlsx(file_path_ruk,
   mutate("variable" = "Rest of the UK",
          "indicator" = "Net Migration",
          area = gsub('SCOTLAND', 'Scotland', area),
-         period = as.numeric(gsub("-.*","",period)),
-  ) %>% 
+         period = as.numeric(gsub("-.*","",period))+1) %>% 
   filter(period >= 2009)
 
 ## ----------------------------------------------------------------
@@ -306,7 +318,8 @@ net_overseas <- readxl::read_excel(file_path_net_overseas,
   mutate("variable" = "Overseas",
          "indicator" = "Net Migration",
          area = gsub('SCOTLAND', 'Scotland', area),
-         period = as.numeric(gsub("-.*","",period)),
+         # +1 is to pick the later of the year range
+         period = as.numeric(gsub("-.*","",period))+1,
          ) %>% 
   filter(period >= 2009)
 
@@ -340,10 +353,7 @@ natural_change <- readxl::read_excel(file_path_natural_change) %>%
 ##                         Combine Data                         ##
 ##################################################################
  
-combined_datasets <- pop_structure %>% 
-  filter(age != "All",
-         period >= (current_year - 12)) %>% 
-  rbind(adr) %>% 
+combined_datasets <- adr %>% 
   mutate("variable" = paste(age, sex)) %>% 
   select(-c(age, sex)) %>%
   rbind(pop_change_by_council_area,
@@ -354,6 +364,12 @@ healthy_life_expectancy <- healthy_life_expectancy %>%
   mutate("variable" = paste(age, sex)) %>% 
   select(-c(age, sex))
 
+
+pop_structure <- pop_structure %>% 
+  filter(age != "All",
+         period >= (current_year - 12)) %>% 
+  mutate("variable" = paste(age, sex)) %>% 
+  select(-c(age, sex))
 
 migration_datasets <-  net_ruk %>%
   rbind(total_net_migration,
