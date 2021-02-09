@@ -83,6 +83,12 @@ pop_structure <- opendatascot:::ods_query_database(endpoint, pop_structure_query
   mutate("indicator" = "Population Structure",
          sex = "")
 
+pop_structure_age <- pop_structure %>% 
+  filter(age != "All",
+         period >= (current_year - 12)) %>% 
+  mutate("variable" = paste0(age, sex)) %>% 
+  select(-c(age, sex))
+
 # Population Change by Council area -------------------------------
 
 pop_change_by_council_area <- pop_structure %>% 
@@ -170,7 +176,9 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
          value = round(value, digits = 2),
          sex = gsub('s', '', sex),
          age = "",
-         period = as.numeric(gsub("-.*", "", period)))
+         period = as.numeric(gsub("-.*", "", period)),
+         "variable" = paste0(age, sex)) %>% 
+  select(-c(age, sex))
 #%>% 
   # Remove any dates that are already in stats.gov.scot dataset
  # filter(!(period %in% hle$period)) %>% 
@@ -354,22 +362,11 @@ natural_change <- readxl::read_excel(file_path_natural_change) %>%
 ##################################################################
  
 combined_datasets <- adr %>% 
-  mutate("variable" = paste(age, sex)) %>% 
+  mutate("variable" = paste0(age, sex)) %>% 
   select(-c(age, sex)) %>%
   rbind(pop_change_by_council_area,
         pop_change_by_data_zone,
         natural_change)
-
-healthy_life_expectancy <- healthy_life_expectancy %>% 
-  mutate("variable" = paste(age, sex)) %>% 
-  select(-c(age, sex))
-
-
-pop_structure <- pop_structure %>% 
-  filter(age != "All",
-         period >= (current_year - 12)) %>% 
-  mutate("variable" = paste(age, sex)) %>% 
-  select(-c(age, sex))
 
 migration_datasets <-  net_ruk %>%
   rbind(total_net_migration,
