@@ -36,26 +36,26 @@ server <- function(input, output, session) {
 
 # Population Structure ----------------------------------------------------
 
-  pop_structure_reactive <- reactive({
+  pop_structure_age_reactive <- reactive({
     
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_arrows <- create_symbols_scotland(pop_structure,
+    scotland_arrows <- create_symbols_scotland(pop_structure_age,
                                                "arrow-up",
                                                "arrow-down")
     
-    council1_arrows <- create_symbols_council1(pop_structure,
+    council1_arrows <- create_symbols_council1(pop_structure_age,
                                                council1,
                                                "arrow-up",
                                                "arrow-down")
     
-    council2_arrows <- create_symbols_council2(pop_structure,
+    council2_arrows <- create_symbols_council2(pop_structure_age,
                                                council2,
                                                "arrow-up",
                                                "arrow-down")
     
-    pop_structure %>%
+    pop_structure_age %>%
       filter(area == "Scotland") %>%
       arrange(period) %>%
       group_by(indicator, variable) %>%
@@ -65,7 +65,7 @@ server <- function(input, output, session) {
                                       period)
       ) %>%
       left_join(
-        pop_structure %>%
+        pop_structure_age %>%
           filter(area %in% council1) %>%
           arrange(period) %>%
           group_by(indicator, variable) %>%
@@ -73,7 +73,7 @@ server <- function(input, output, session) {
           summarise({{council1}} := sparkline_format(value, 
                                                      period))) %>%
       left_join(
-        pop_structure %>%
+        pop_structure_age %>%
           filter(area %in% council2) %>%
           arrange(period) %>%
           group_by(indicator, variable) %>%
@@ -81,8 +81,7 @@ server <- function(input, output, session) {
           summarise({{council2}} := sparkline_format(value, 
                                                      period))
       ) %>%
-      arrange(match(indicator, Indicator_order),
-              match(variable, variable_order)) %>%
+      arrange(match(variable, variable_order)) %>%
       left_join(scotland_arrows) %>%
       relocate(arrow, .after = Scotland) %>% 
       left_join(council1_arrows) %>%
@@ -143,8 +142,7 @@ server <- function(input, output, session) {
           summarise({{council2}} := sparkbar_format(value, 
                                                      period))
       ) %>%
-      arrange(match(indicator, indicator_order),
-              match(variable, variable_order)) %>%
+      arrange(match(variable, variable_order)) %>%
       left_join(scotland_arrows) %>%
       relocate(arrow, .after = Scotland) %>% 
       left_join(council1_arrows) %>%
@@ -248,8 +246,7 @@ server <- function(input, output, session) {
           # Sparkline for Council area input 2
           summarise({{council2}} := sparkline_format(value, period))
       ) %>%
-      arrange(match(indicator, indicator_order),
-              match(variable, variable_order)) %>%
+      arrange(match(variable, variable_order)) %>%
       left_join(scotland_arrows) %>%
       relocate(arrow, .after = Scotland) %>% 
       left_join(council1_arrows) %>%
@@ -309,8 +306,7 @@ server <- function(input, output, session) {
           # Sparkline for Council area input 2
           summarise({{council2}} := sparkline_format(value, period))
       ) %>%
-      arrange(match(indicator, indicator_order),
-              match(variable, variable_order)) %>%
+      arrange(match(variable, variable_order)) %>%
       left_join(scotland_arrows) %>%
       relocate(arrow, .after = Scotland) %>% 
       left_join(council1_arrows) %>%
@@ -334,7 +330,7 @@ server <- function(input, output, session) {
     
     cb <- htmlwidgets::JS('function(){debugger;HTMLWidgets.staticRender();}')
     
-    dtable <- datatable(pop_structure_reactive() %>% 
+    dtable <- datatable(pop_structure_age_reactive() %>% 
                           rbind(healthy_life_expectancy_reactive(),
                                 combined_datasets_reactive(),
                                 migration_reactive(),
