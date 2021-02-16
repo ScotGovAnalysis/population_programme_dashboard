@@ -1,7 +1,31 @@
-button:focus,
+
+
+body {
+    font-size: 18px;
+    color: #333;
+    background-color: #fff;
+}
+
+.navbar-default {
+    background-color: #ffffff;
+    border-color: #e7e7e7;
+}
+
+.navbar-default .navbar-brand {
+                         color: #333333;
+    
+}
 a:focus {
     background-color: #fdd522 !important;
     color: #333333 !important;
     outline-offset: 0;
     transition-duration: 0s;
 }
+
+nav:before {
+    background: #0065bd;
+    display: block !important;
+    content: '';
+    height: 7px;
+}
+
