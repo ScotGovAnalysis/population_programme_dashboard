@@ -192,11 +192,15 @@ server <- function(input, output, session) {
     
     cb <- htmlwidgets::JS('function(){debugger;HTMLWidgets.staticRender();}')
     
-    dtable <- datatable(pop_structure_age_reactive() %>% 
-                          rbind(active_dependency_ratio_reactive(),
-                                combined_datasets_reactive(),
-                                natural_change_reactive(),
-                                migration_reactive()),
+    data <- pop_structure_age_reactive() %>% 
+      rbind(active_dependency_ratio_reactive(),
+            combined_datasets_reactive(),
+            natural_change_reactive(),
+            migration_reactive())
+    
+    colnames(data)[c(1,2, 4, 6, 8)] <- paste0('<span style="color:',"white",'">',colnames(data)[c(1,2, 4, 6, 8)],'</span>')
+    
+    dtable <- datatable(data,
       escape = FALSE,
       class = 'row-border',
       rownames = FALSE,
@@ -220,7 +224,8 @@ server <- function(input, output, session) {
         bPaginate = FALSE,
         bSort = FALSE,
         bFilter = FALSE
-      ))
+      )) %>%
+      formatStyle(columns = c(1,2, 4, 6, 8), color = "white")
 
    # Merge the Indicators column
    # https://stackoverflow.com/questions/39484118/shiny-merge-cells-in-dtdatatable
@@ -229,8 +234,8 @@ server <- function(input, output, session) {
       "www/", script = "dataTables.rowsGroup.js")
 
     dtable$dependencies <- c(dtable$dependencies, list(dep))
-    dtable
-
+   
+   dtable
   })
   
   
