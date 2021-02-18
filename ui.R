@@ -18,12 +18,12 @@ ui <- navbarPage(
     fluidRow(
       column(2),
       column(4,
-             h4("Select 2 council areas to compare:")),
+             "Select 2 council areas to compare:"),
       column(
         2,
         selectInput(
           "council_1",
-          label = NULL,
+          label = "Council Area selection 1:",
           choices = council_areas$area,
           selected = "Aberdeen City"
         )
@@ -32,7 +32,7 @@ ui <- navbarPage(
         2,
         selectInput(
           "council_2",
-          label = NULL,
+          label = "Council Area selection 2:",
           choices = council_areas$area,
           selected = "Aberdeenshire"
         )
