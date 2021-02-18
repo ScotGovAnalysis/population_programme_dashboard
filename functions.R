@@ -1,18 +1,27 @@
-# 
-# significant_change_calulator <- function(currentX,
-#                                          previousY,
-#                                          ConfidenceIntervalX,
-#                                          ConfidenceIntervalY,
-#                                          direction) {
-#   if (direction == "upper") {
-#     (current - previous) + 1.96 * sqrt((ConfidenceIntervalX / 1.96) ^ 2 + (ConfidenceIntervalY /
-#                                                                                 1.96) ^ 2)
-#   } else {
-#     (current - previous) - 1.96 * sqrt((ConfidenceIntervalX / 1.96) ^ 2 + (ConfidenceIntervalY /
-#                                                                                 1.96) ^ 2)
-#   }
-# }
+
+significant_change_calulator <- function(currentX,
+                                         previousY,
+                                         ConfidenceIntervalX,
+                                         ConfidenceIntervalY,
+                                         direction) {
+  if (direction == "upper") {
+    (current - previous) + 1.96 * sqrt((ConfidenceIntervalX / 1.96) ^ 2 + (ConfidenceIntervalY / 1.96) ^ 2)
+  } else {
+    (current - previous) - 1.96 * sqrt((ConfidenceIntervalX / 1.96) ^ 2 + (ConfidenceIntervalY / 1.96) ^ 2)
+  }
+}
 # TODO 6 different conditions for 3 icons 
+
+# Both increase = Improve
+# 1 increase 1 maintain = Improve
+
+# Both maintain = maintain
+# 1 increase & 1 worsen = maintain
+
+# Both decrease = Worsen
+# 1 decrease & 1 maintain = Worsen
+
+
 #################################################################
 ##                      Sparkline Formats                      ##
 #################################################################
@@ -70,13 +79,13 @@ create_symbols_scotland <- function(data, symbol_up, symbol_down){
     mutate(change = ifelse(value - lag(value) > 0, 1, 
                            ifelse(value - lag(value) < 0, 2, 0))) %>%
     filter(!is.na(change)) %>%
-    mutate(arrow = ifelse(change == 1,
+    mutate(icon = ifelse(change == 1,
       as.character(icon(symbol_down, lib = "glyphicon")),
       ifelse(change == 2, 
              as.character(icon(symbol_up,lib = "glyphicon")),
              as.character(icon("minus", lib = "glyphicon"))))) %>%
     ungroup() %>%
-    select(variable, arrow)
+    select(variable, icon)
 }
 
 # Symbols for council 1 ---------------------------------------------------
@@ -92,13 +101,13 @@ create_symbols_council1 <- function(data, council, symbol_up, symbol_down){
     mutate(change = ifelse(value - lag(value) > 0, 1,
                            ifelse(value - lag(value) < 0, 2, 0))) %>%
     filter(!is.na(change)) %>%
-    mutate(arrow1 = ifelse(change == 1,
+    mutate(icon1 = ifelse(change == 1,
       as.character(icon(symbol_down,lib = "glyphicon")),
       ifelse(change == 2,
              as.character(icon(symbol_up,lib = "glyphicon")),
              as.character(icon("minus",lib = "glyphicon"))))) %>%
     ungroup() %>%
-    select(variable, arrow1)
+    select(variable, icon1)
 }
 
 
@@ -115,13 +124,13 @@ create_symbols_council2 <- function(data, council, symbol_up, symbol_down){
     mutate(change = ifelse(value - lag(value) > 0, 1, 
                            ifelse(value - lag(value) < 0, 2, 0))) %>%
     filter(!is.na(change)) %>%
-    mutate(arrow2 = ifelse(
+    mutate(icon2 = ifelse(
       change == 1,
       as.character(icon(symbol_down, lib = "glyphicon")),
       ifelse(change == 2, as.character(icon(symbol_up, lib = "glyphicon")),
              as.character(icon("minus", lib = "glyphicon"))))) %>%
     ungroup() %>%
-    select(variable, arrow2)
+    select(variable, icon2)
 }
 
 
@@ -158,17 +167,11 @@ combine_columns_and_symbols <- function(data, x, y, a, b, c, type){
   arrange(match(variable, variable_order)) %>%
   # Join all the symbol columns
   left_join(a) %>%
-  relocate(arrow, .after = Scotland) %>% 
+  relocate(icon, .after = Scotland) %>% 
   left_join(b) %>%
-  relocate(arrow1, .after = 5) %>% 
+  relocate(icon1, .after = 5) %>% 
   left_join(c) %>%
-  relocate(arrow2, .after = 7) %>% 
-  # Hide column names
-  rename("     " = indicator,
-         "    " = variable,
-         "   " = arrow,
-         "  " = arrow1,
-         " " = arrow2)
+  relocate(icon2, .after = 7)
 }
 
 # Tooltips for the table
