@@ -1,4 +1,5 @@
 
+
 significant_change_calulator <- function(currentX,
                                          previousY,
                                          ConfidenceIntervalX,
@@ -188,7 +189,7 @@ rcb <- c(
   "    $('td:eq(0)', row).attr('title', 'Average number of years a new born baby could be expected to live in ‘good’ or ‘very good’ health. Figures based on 3-year ranges.');",
   # Row 6
   "  }else if(index === 6){",
-  "    $('td:eq(0)', row).attr('title', 'Figures based on 3-year ranges.');",
+  "    $('td:eq(0)', row).attr('title', 'Figures showing mid-year based on 3-year ranges.');",
   # Row 6
   "  }else if(index === 8){",
   "    $('td:eq(0)', row).attr('title', 'Population Change');",
