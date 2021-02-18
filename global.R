@@ -183,10 +183,13 @@ adr <- opendatascot::ods_dataset(
 life_expectancy <- opendatascot:::ods_query_database(endpoint, le_query) %>%
   mutate("indicator" = "Life Expectancy",
          period = as.numeric(gsub("-.*", "", period))) %>% 
-  filter(period >= (current_year-12)+1) %>%
+  # -13 to include 2019 in mid year from three year range
+  filter(period >= (current_year-13)) %>%
   mutate(value = round(value, digits = 2),
          age = "",
-         "variable" = paste0(age, sex)) %>% 
+         "variable" = paste0(age, sex),
+         # Add one to get middle year of 3 year range
+         period = period+1) %>% 
   select(-c(age, sex))
 
 ## ---------------------------------------------------------------
@@ -407,7 +410,9 @@ active_dependency_ratio <- adr %>%
   select(-c(age, sex)) %>%  
   mutate(indicator = paste(indicator, 
                            as.character(icon("info-sign", 
-                                             lib = "glyphicon"))))
+                                             lib = "glyphicon")))) %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
   
 combined_datasets <- rbind(pop_change_by_council_area,
   pop_change_by_data_zone) %>%
@@ -416,13 +421,17 @@ combined_datasets <- rbind(pop_change_by_council_area,
                                             lib = "glyphicon")))) %>%
   rbind(healthy_life_expectancy,
         life_expectancy) %>%  
-  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) 
+  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
 
 
 
 natural_change <- natural_change %>%
   mutate(variable = paste(variable, as.character(icon("info-sign", lib = "glyphicon"))),
-         indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon"))))
+         indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
 
 
 migration_datasets <-  net_ruk %>%
@@ -430,5 +439,9 @@ migration_datasets <-  net_ruk %>%
         net_overseas,
         net_within_scotland) %>% 
   mutate(variable = paste(variable, as.character(icon("info-sign", lib = "glyphicon"))),
-         indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon"))))
+         indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
+
+
 
