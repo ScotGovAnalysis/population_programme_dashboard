@@ -224,9 +224,8 @@ server <- function(input, output, session) {
         bPaginate = FALSE,
         bSort = FALSE,
         bFilter = FALSE
-      )) %>%
-      formatStyle(columns = c(1,2, 4, 6, 8), color = "white")
-
+      ))
+    
    # Merge the Indicators column
    # https://stackoverflow.com/questions/39484118/shiny-merge-cells-in-dtdatatable
     dep <- htmltools::htmlDependency(
