@@ -4,10 +4,9 @@
 
 library(shiny)
 library(dplyr)
-library(formattable)
 library(sparkline)
-library(SPARQL)
 library(DT)
+library(ggplot2)
 
 #################################################################
 ##                          Variables                          ##
@@ -49,25 +48,47 @@ year_quarters <- paste0(rep(as.character(c((current_year - 12):(current_year))),
 
 indicator_order <- c("Population Structure",
                      "Active Dependency Ratio",
+                     "Life Expectancy",
                      "Healthy Life Expectancy",
                      "Population Change",
                      "Net Migration")
+
+variables <- c("Children (under 16 years)",
+               "Working Age (16 - 64)",
+               "Pensionable Age (65 and over)",
+               "",
+               "Females",
+               "Males",
+               "Female",
+               "Male",
+               "% Increased data zones",
+               "% Decreased data zones",
+               "Increased council areas",
+               "Decreased council areas",
+               "Natural Change",
+               "Within Scotland",
+               "Rest of the UK",
+               "Overseas",
+               "Total")
 
 variable_order <- c("Children (under 16 years)",
                     "Working Age (16 - 64)",
                     "Pensionable Age (65 and over)",
                     "",
+                    "Females",
+                    "Males",
                     "Female",
                     "Male",
-                    "Natural Change",
-                    "% Increased data zones",
-                    "% Decreased data zones",
-                    "Increased council areas",
-                    "Decreased council areas",
-                    "Within Scotland",
-                    "Rest of the UK",
-                    "Overseas",
-                    "Total")
+                    "Natural Change <i class=\"glyphicon glyphicon-info-sign\"></i>",
+                    "% Increased data zones <i class=\"glyphicon glyphicon-info-sign\"></i>",
+                    "% Decreased data zones <i class=\"glyphicon glyphicon-info-sign\"></i>",
+                    "Increased council areas <i class=\"glyphicon glyphicon-info-sign\"></i>",
+                    "Decreased council areas <i class=\"glyphicon glyphicon-info-sign\"></i>",
+                    "Within Scotland <i class=\"glyphicon glyphicon-info-sign\"></i>",
+                    "Rest of the UK <i class=\"glyphicon glyphicon-info-sign\"></i>",
+                    "Overseas <i class=\"glyphicon glyphicon-info-sign\"></i>",
+                    "Total <i class=\"glyphicon glyphicon-info-sign\"></i>")
+  
 
 source("SPARQL_queries.R")
 source("functions.R")
@@ -87,7 +108,8 @@ pop_structure_age <- pop_structure %>%
   filter(age != "All",
          period >= (current_year - 12)) %>% 
   mutate("variable" = paste0(age, sex)) %>% 
-  select(-c(age, sex))
+  select(-c(age, sex))  %>% 
+  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon"))))
 
 # Population Change by Council area -------------------------------
 
@@ -153,11 +175,24 @@ adr <- opendatascot::ods_dataset(
   select(area, period, value, indicator) %>% 
   mutate(sex = "",
          age = "")
+## ---------------------------------------------------------------
+##                         Life expectancy                      --
+## ---------------------------------------------------------------
+#TODO set to middle year until you can work out tooltips
 
+life_expectancy <- opendatascot:::ods_query_database(endpoint, le_query) %>%
+  mutate("indicator" = "Life Expectancy",
+         period = as.numeric(gsub("-.*", "", period))) %>% 
+  filter(period >= (current_year-12)+1) %>%
+  mutate(value = round(value, digits = 2),
+         age = "",
+         "variable" = paste0(age, sex)) %>% 
+  select(-c(age, sex))
 
 ## ---------------------------------------------------------------
 ##                   Healthy life expectancy                   --
 ## ---------------------------------------------------------------
+#TODO set to middle year until you can work out tooltips
 
 # hle <- opendatascot:::ods_query_database(endpoint, hle_query) %>%
 #   mutate("  " = "Healthy Life Expectancy",
@@ -170,20 +205,25 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
          "period" = Period,
          "age" = `Age group`,
          "value" = `Healthy Life Expectancy (HLE) _`,
-         "sex" = Sex
+         "sex" = Sex#,
+         # "lower_ci" = `HLE Lower CI_`,
+         # "upper_ci" = `HLE Upper CI_`
          ) %>%
   mutate("indicator" = "Healthy Life Expectancy",
          value = round(value, digits = 2),
-         sex = gsub('s', '', sex),
+        # sex = gsub('s', '', sex),
          age = "",
-         period = as.numeric(gsub("-.*", "", period)),
+         period = (as.numeric(gsub("-.*", "", period))+1),
          "variable" = paste0(age, sex)) %>% 
   select(-c(age, sex))
 #%>% 
   # Remove any dates that are already in stats.gov.scot dataset
  # filter(!(period %in% hle$period)) %>% 
  # rbind(hle) %>% 
-  
+  # hle_change <- healthy_life_expectancy %>% 
+  #   filter(period %in% c(max(period), max(period)-1)) %>% 
+  #   group_by(area, period) %>% 
+  #   summarise(change = significant_change_calulator())
 
 ## ---------------------------------------------------------------
 ##               Population Change - Data Zones               --
@@ -287,7 +327,9 @@ net_within_scotland <- readxl::read_excel(
 mutate(area = gsub("Total Moves within Scotland3", "Scotland", area),
        "variable" = "Within Scotland",
        "indicator" = "Net Migration",
-       period = as.numeric(gsub("-.*","",period))+1) %>% 
+       period = as.numeric(gsub("-.*","",period))+1,
+       value = ifelse(area == "Scotland", 0, value)) %>% 
+  
   filter(period >= 2009)
 
 ## ----------------------------------------------------------------
@@ -360,15 +402,33 @@ natural_change <- readxl::read_excel(file_path_natural_change) %>%
 ##################################################################
 ##                         Combine Data                         ##
 ##################################################################
- 
-combined_datasets <- adr %>% 
+active_dependency_ratio <- adr %>% 
   mutate("variable" = paste0(age, sex)) %>% 
-  select(-c(age, sex)) %>%
-  rbind(pop_change_by_council_area,
-        pop_change_by_data_zone,
-        natural_change)
+  select(-c(age, sex)) %>%  
+  mutate(indicator = paste(indicator, 
+                           as.character(icon("info-sign", 
+                                             lib = "glyphicon"))))
+  
+combined_datasets <- rbind(pop_change_by_council_area,
+  pop_change_by_data_zone) %>%
+  mutate(variable = paste(variable, 
+                          as.character(icon("info-sign", 
+                                            lib = "glyphicon")))) %>%
+  rbind(healthy_life_expectancy,
+        life_expectancy) %>%  
+  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) 
+
+
+
+natural_change <- natural_change %>%
+  mutate(variable = paste(variable, as.character(icon("info-sign", lib = "glyphicon"))),
+         indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon"))))
+
 
 migration_datasets <-  net_ruk %>%
   rbind(total_net_migration,
         net_overseas,
-        net_within_scotland)
+        net_within_scotland) %>% 
+  mutate(variable = paste(variable, as.character(icon("info-sign", lib = "glyphicon"))),
+         indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon"))))
+
