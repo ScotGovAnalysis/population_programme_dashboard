@@ -1,22 +1,26 @@
 
 
-significant_change_calulator <- function(currentX,
-                                         previousY,
-                                         ConfidenceIntervalX,
-                                         ConfidenceIntervalY,
-                                         direction) {
-  if (direction == "upper") {
-    (current - previous) + 1.96 * sqrt((ConfidenceIntervalX / 1.96) ^ 2 + (ConfidenceIntervalY / 1.96) ^ 2)
+significant_change_calulator <- function(estimate,
+                                         confidence_interval,
+                                         limit) {
+  if (limit == "upper") {
+    (estimate - lag(estimate)) + 1.96 * sqrt((confidence_interval / 1.96) ^ 2 + (lag(confidence_interval) / 1.96) ^ 2)
   } else {
-    (current - previous) - 1.96 * sqrt((ConfidenceIntervalX / 1.96) ^ 2 + (ConfidenceIntervalY / 1.96) ^ 2)
+    (estimate - lag(estimate)) - 1.96 * sqrt((confidence_interval / 1.96) ^ 2 + (lag(confidence_interval) / 1.96) ^ 2)
   }
 }
+
+
+
+
+
+
 # TODO 6 different conditions for 3 icons 
 
 # Both increase = Improve
 # 1 increase 1 maintain = Improve
 
-# Both maintain = maintain
+# Neither change = maintain
 # 1 increase & 1 worsen = maintain
 
 # Both decrease = Worsen
@@ -120,7 +124,7 @@ create_symbols_council2 <- function(data, council, symbol_up, symbol_down){
     filter(area %in% council) %>%
     group_by(indicator, variable) %>%
     arrange(desc(period)) %>%
-    filter(!is.na(value)) %>% 
+    filter(!is.na(value)) %>%   
     slice_max(period, n = 2) %>%
     mutate(change = ifelse(value - lag(value) > 0, 1, 
                            ifelse(value - lag(value) < 0, 2, 0))) %>%
@@ -183,13 +187,13 @@ rcb <- c(
   "    $('td:eq(0)', row).attr('title', 'Proportion of children, people aged 16-64 and people aged 65 and over.');",
   # Row 3
   "  }else if(index === 3){",
-  "    $('td:eq(0)', row).attr('title', 'Number of people aged 16 and over economically inactive per 1,000 economically active.');",
+  "    $('td:eq(0)', row).attr('title', 'Number of people aged 16 and over that are economically inactive per 1,000 economically active.');",
   # Row 4
   "  }else if(index === 4){",
   "    $('td:eq(0)', row).attr('title', 'Average number of years a new born baby could be expected to live in ‘good’ or ‘very good’ health. Figures based on 3-year ranges.');",
   # Row 6
   "  }else if(index === 6){",
-  "    $('td:eq(0)', row).attr('title', 'Figures showing mid-year based on 3-year ranges.');",
+  "    $('td:eq(0)', row).attr('title', 'Average number of years a new born baby could be expected to live. Figures showing mid-year based on 3-year ranges.');",
   # Row 6
   "  }else if(index === 8){",
   "    $('td:eq(0)', row).attr('title', 'Population Change');",
@@ -205,19 +209,19 @@ rcb <- c(
   "    $('td:eq(1)', row).attr('title', 'The number of councils experiencing population decline.');",
   # Row 11
   "  }else if(index === 12){",
-  "    $('td:eq(1)', row).attr('title', 'Births minus deaths');",
+  "    $('td:eq(1)', row).attr('title', 'Number of births minus deaths');",
   # Row 7
   "  }else if(index === 13){",
-  "    $('td:eq(0)', row).attr('title', 'Net Migration');",
-  "    $('td:eq(1)', row).attr('title', 'Migration between Scottish council areas');",
+  "    $('td:eq(0)', row).attr('title', 'Inward minus outward migration');",
+  "    $('td:eq(1)', row).attr('title', 'Net Migration from other areas within Scotland');",
   # Row 12
   "  }else if(index === 14){",
-  "    $('td:eq(1)', row).attr('title', 'Migration to Scotland from the rest of the UK');",
+  "    $('td:eq(1)', row).attr('title', 'Net migration from the rest of the UK');",
   # Row 13
   "  }else if(index === 15){",
-  "    $('td:eq(1)', row).attr('title', 'Migration to Scotland from Overseas');",
+  "    $('td:eq(1)', row).attr('title', 'Net migration from outside the UK');",
   # Row 14
   "  }else if(index === 16){",
-  "    $('td:eq(1)', row).attr('title', 'Total migration in Scotland');",
+  "    $('td:eq(1)', row).attr('title', 'Net migration from other areas within Scotland and areas outwith Scotland');",
   "  }}")
 
