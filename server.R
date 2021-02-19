@@ -249,7 +249,7 @@ paste(as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
        as.character(icon("thumbs-up", lib = "glyphicon")), "Improving,",
        as.character(icon("thumbs-down", lib = "glyphicon")), "Worsening,",
        as.character(icon("minus", lib = "glyphicon")), "Maintaining", br(),
-       "<b>*Data range is 2009-2019\b"
+       "<b>", "*Data range is", current_year-12, "-", current_year-2, "\b"
        )
     
   })
