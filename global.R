@@ -315,14 +315,14 @@ pop_estimates_datazones <- opendatascot::ods_dataset(
     sex = "all",
     age = "all",
     refPeriod = as.character(c((current_year - 5):current_year))
-  ))
-
-# Clean data
-pop_change_by_data_zone <- pop_estimates_datazones %>%
+  )) %>%
   mutate("indicator" = "Population Change") %>%
   select(-measureType) %>%
   rename("zone" = refArea,
-         "period" = refPeriod) %>%
+         "period" = refPeriod)
+
+# Clean data
+pop_change_by_data_zone <- pop_estimates_datazones %>%
   group_by(zone) %>%
   arrange(period) %>%
   mutate(
@@ -485,15 +485,15 @@ pop_change <- rbind(pop_change_by_council_area,
 
 
 life_expectancies <- rbind(healthy_life_expectancy,
-        life_expectancy) %>%  
-  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
-  group_by(area, variable, indicator) %>% 
+        life_expectancy) %>%
+  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>%
+  group_by(area, variable, indicator) %>%
   tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
+
 
 migration_datasets <-  net_ruk %>%
   rbind(total_net_migration,
-        net_overseas,
-        net_within_scotland) %>% 
+        net_overseas) %>% 
   mutate(variable = paste(variable, as.character(icon("info-sign", lib = "glyphicon"))),
          indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
   group_by(area, variable, indicator) %>% 
