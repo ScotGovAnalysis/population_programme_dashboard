@@ -33,7 +33,35 @@ server <- function(input, output, session) {
 #################################################################
 ##                      Reactive Datasets                      ##
 #################################################################
+  net_within_scot_reactive <- reactive({
+    
+    council1 <- input$council_1
+    council2 <- input$council_2
+    
+    scotland_symbol <- tibble(variable = paste("Within Scotland", as.character(icon("info-sign", lib = "glyphicon"))),
+                              icon = "")
+    
+    council1_symbol <- create_symbols_council1(net_within_scotland,
+                                               council1,
+                                               "arrow-up",
+                                               "arrow-down")
+    
+    council2_symbol <- create_symbols_council2(net_within_scotland,
+                                               council2,
+                                               "arrow-up",
+                                               "arrow-down")
+    
+    combine_columns_and_symbols_within_scot(net_within_scotland, 
+                                council1, 
+                                council2, 
+                                scotland_symbol, 
+                                council1_symbol, 
+                                council2_symbol,
+                                "bar")
+  })
 
+
+  
 # Population Structure ----------------------------------------------------
 
   pop_structure_age_reactive <- reactive({
@@ -94,6 +122,36 @@ server <- function(input, output, session) {
                                council2_symbol,
                                "line")
   })
+  
+# Life expectency ----------------------------------------------------
+
+  life_expectancies_reactive <- reactive({
+
+    council1 <- input$council_1
+    council2 <- input$council_2
+
+    scotland_symbol <- create_symbols_scotland(life_expectancies,
+                                               "thumbs-down",
+                                               "thumbs-up")
+
+    council1_symbol <- create_symbols_council1(life_expectancies,
+                                               council1,
+                                               "thumbs-down",
+                                               "thumbs-up")
+
+    council2_symbol <- create_symbols_council2(life_expectancies,
+                                               council2,
+                                               "thumbs-down",
+                                               "thumbs-up")
+
+    combine_columns_and_symbols(life_expectancies,
+                               council1,
+                               council2,
+                               scotland_symbol,
+                               council1_symbol,
+                               council2_symbol,
+                               "line")
+  })
 
 # Migration ---------------------------------------------------------------
   migration_reactive <- reactive({
@@ -122,7 +180,7 @@ server <- function(input, output, session) {
                                 council1_symbol, 
                                 council2_symbol,
                                 "bar")
-  })
+    })
   
   
 # Migration ---------------------------------------------------------------
@@ -156,26 +214,26 @@ server <- function(input, output, session) {
   
   # All other datasets -------------------------------------------
   
-  combined_datasets_reactive <- reactive({
+  pop_change_reactive <- reactive({
     
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_symbol <- create_symbols_scotland(combined_datasets,
+    scotland_symbol <- create_symbols_scotland(pop_change,
                                                "thumbs-up",
                                                "thumbs-down")
     
-    council1_symbol <- create_symbols_council1(combined_datasets,
+    council1_symbol <- create_symbols_council1(pop_change,
                                                council1,
                                                "thumbs-up",
                                                "thumbs-down")
     
-    council2_symbol <- create_symbols_council2(combined_datasets,
+    council2_symbol <- create_symbols_council2(pop_change,
                                                council2,
                                                "thumbs-up",
                                                "thumbs-down")
     
-    combine_columns_and_symbols(combined_datasets, 
+    combine_columns_and_symbols(pop_change, 
                                 council1, 
                                 council2, 
                                 scotland_symbol, 
@@ -194,11 +252,14 @@ server <- function(input, output, session) {
     
     data <- pop_structure_age_reactive() %>% 
       rbind(active_dependency_ratio_reactive(),
-            combined_datasets_reactive(),
+            life_expectancies_reactive(),
+            pop_change_reactive(),
+            net_within_scot_reactive(),
             natural_change_reactive(),
             migration_reactive())
     
-    colnames(data)[c(1,2, 4, 6, 8)] <- paste0('<span style="color:',"white",'">',colnames(data)[c(1,2, 4, 6, 8)],'</span>')
+    colnames(data)[c(1,2, 4, 6, 8)] <- paste0('<span style="color:',"white",'">',
+                                              colnames(data)[c(1,2, 4, 6, 8)],'</span>')
     
     dtable <- datatable(data,
       escape = FALSE,
@@ -235,7 +296,7 @@ server <- function(input, output, session) {
     dtable$dependencies <- c(dtable$dependencies, list(dep))
    
    dtable
-  })
+   })
   
   
 #################################################################
