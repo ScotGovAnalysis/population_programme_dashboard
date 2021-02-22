@@ -179,6 +179,42 @@ combine_columns_and_symbols <- function(data, x, y, a, b, c, type){
   relocate(icon2, .after = 7)
 }
 
+# For within scotland
+combine_columns_and_symbols_within_scot <- function(data, x, y, a, b, c, type){
+  # Take data and create sparkline for just Scotland
+  data %>%
+  filter(area == "Scotland") %>%
+  arrange(period) %>%
+  group_by(indicator, variable) %>%
+  summarise(
+    # Sparkline for Scotland
+    "Scotland" = HTML("")) %>%
+  # Create and join sparkline for just user input 1
+  left_join(
+    data %>%
+      filter(area %in% x) %>%
+      arrange(period) %>%
+      group_by(indicator, variable) %>%
+      # Sparkline for Council area input 1 (y)
+      summarise({{x}} := sparkline_format(type, value, period))) %>%
+  # Create and join sparkline for just user input 2
+  left_join(
+    data %>%
+      filter(area %in% y) %>%
+      arrange(period) %>%
+      group_by(indicator, variable) %>%
+      # Sparkline for Council area input 2 (y)
+      summarise({{y}} := sparkline_format(type, value, period))) %>%
+  arrange(match(variable, variable_order)) %>%
+  # Join all the symbol columns
+  left_join(a) %>%
+  relocate(icon, .after = Scotland) %>% 
+  left_join(b) %>%
+  relocate(icon1, .after = 5) %>% 
+  left_join(c) %>%
+  relocate(icon2, .after = 7)
+}
+
 # Tooltips for the table
 rcb <- c(
   "function(row, data, num, index){",
