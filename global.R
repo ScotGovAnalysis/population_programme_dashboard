@@ -6,17 +6,13 @@ library(shiny)
 library(dplyr)
 library(sparkline)
 library(DT)
-library(ggplot2)
+library(opendatascot)
 
 #################################################################
 ##                          Variables                          ##
 #################################################################
 
-# Read in static data files
-
-#Healthy life expectancy
-# This file has been modified to add NA's to all the years with 
-# missing values for the council areas
+# File paths for static data files
 file_path_hle <- "data/HLE.xlsx"
 # Net Migration within Scotland
 file_path_net_with_scot <- "data/migflow-ca-01-latest-tab1.xlsx"
@@ -58,6 +54,7 @@ variables <- c("Children (under 16 years)",
                "Pensionable Age (65 and over)",
                "",
                "Females",
+               "Overall",
                "Males",
                "Female",
                "Male",
@@ -100,16 +97,23 @@ source("functions.R")
 ##                     Population Structure                     --
 ##----------------------------------------------------------------
 
-pop_structure <- opendatascot:::ods_query_database(endpoint, pop_structure_query) %>%
-  mutate("indicator" = "Population Structure",
-         sex = "")
+# Call data with API
+pop_structure <- opendatascot:::ods_query_database(endpoint, pop_structure_query) 
 
-pop_structure_age <- pop_structure %>% 
+
+# Population structure by age ---------------------------------------------
+
+pop_structure_age <- pop_structure %>%
+  mutate("indicator" = "Population Structure",
+         sex = "") %>% 
   filter(age != "All",
          period >= (current_year - 12)) %>% 
   mutate("variable" = paste0(age, sex)) %>% 
   select(-c(age, sex))  %>% 
-  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon"))))
+  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
+
 
 # Population Change by Council area -------------------------------
 
@@ -146,23 +150,25 @@ pop_change_by_council_area <- pop_structure %>%
 ## ---------------------------------------------------------------
 ##                   Active Dependency Ratio                   --
 ## ---------------------------------------------------------------
-
-# Get economic INACTIVITY
-adr <- opendatascot::ods_dataset(
+inactive <- ods_dataset(
   "economic-inactivity",
   measureType = "count",
   gender = "all",
   refPeriod = year_quarters
-) %>%
+)
+
+active <- ods_dataset(
+  "economic-activity",
+  measureType = "count",
+  gender = "all",
+  refPeriod = year_quarters
+)
+
+active_dependency_ratio <- inactive %>% 
   group_by(refArea, refPeriod) %>%
   summarise(inactivity = sum(as.numeric(value))) %>%
 # Join economic ACTIVITY
-  inner_join(opendatascot::ods_dataset(
-    "economic-activity",
-    measureType = "count",
-    gender = "all",
-    refPeriod = year_quarters
-  ) %>%
+  inner_join(active %>%
     group_by(refArea, refPeriod) %>%
     summarise(activity = sum(as.numeric(value)))) %>%
   # Remove the "-QX" to make it numeric 
@@ -174,11 +180,18 @@ adr <- opendatascot::ods_dataset(
   ungroup() %>% 
   select(area, period, value, indicator) %>% 
   mutate(sex = "",
-         age = "")
+         age = "",
+         "variable" = paste0(age, sex)) %>% 
+  select(-c(age, sex)) %>%  
+  mutate(indicator = paste(indicator, 
+                           as.character(icon("info-sign", 
+                                             lib = "glyphicon")))) %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
+
 ## ---------------------------------------------------------------
 ##                         Life expectancy                      --
 ## ---------------------------------------------------------------
-#TODO set to middle year until you can work out tooltips
 
 life_expectancy <- opendatascot:::ods_query_database(endpoint, le_query) %>%
   mutate("indicator" = "Life Expectancy",
@@ -193,16 +206,16 @@ life_expectancy <- opendatascot:::ods_query_database(endpoint, le_query) %>%
   select(-c(age, sex))
 
 ## ---------------------------------------------------------------
-##                   Healthy life expectancy                   --
+##                   Healthy life expectancy                    --
 ## ---------------------------------------------------------------
-#TODO set to middle year until you can work out tooltips
 
+# Join static healthy life expectancy data to API datset 
+# Statistics.gov.scot only has > 2015 - 2016
 # hle <- opendatascot:::ods_query_database(endpoint, hle_query) %>%
 #   mutate("  " = "Healthy Life Expectancy",
 #          period = as.numeric(gsub("-.*", "", period)))
 
-# Join static healthy life expectancy data to API datset 
-    # Statistics.gov.scot only has > 2015 - 2016
+
 healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>% 
   select("area" = Area_name,
          "period" = Period,
@@ -218,22 +231,70 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
          age = "",
          period = (as.numeric(gsub("-.*", "", period))+1),
          "variable" = paste0(age, sex)) %>% 
-  select(-c(age, sex))
-#%>% 
-  # Remove any dates that are already in stats.gov.scot dataset
- # filter(!(period %in% hle$period)) %>% 
- # rbind(hle) %>% 
-  # hle_change <- healthy_life_expectancy %>% 
-  #   filter(period %in% c(max(period), max(period)-1)) %>% 
-  #   group_by(area, period) %>% 
-  #   summarise(change = significant_change_calulator())
+  select(-c(age, sex)) %>% 
+  # Add in council areas for missing years
+  group_by(period, variable, indicator) %>% 
+  tidyr::complete(area = council_areas$area)
+
+
+
+#TODO do this instead of the ordinary icon function
+
+CI_healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>% 
+  select("area" = Area_name,
+         "period" = Period,
+         "age" = `Age group`,
+         "value" = `Healthy Life Expectancy (HLE) _`,
+         "sex" = Sex,
+         "lower_ci" = `HLE Lower CI_`,
+         "upper_ci" = `HLE Upper CI_`
+  ) %>%
+  mutate("indicator" = "Healthy Life Expectancy",
+         value = round(value, digits = 2),
+         # sex = gsub('s', '', sex),
+         age = "",
+         period = (as.numeric(gsub("-.*", "", period))+1),
+         "variable" = paste0(age, sex)) %>% 
+  select(-c(age, sex)) %>% 
+  filter(period %in% c(max(period), (max(period)-1))) %>% 
+  group_by(variable, area) %>% 
+  mutate(ci = value - lower_ci,
+         upper_limit = significant_change_calulator(estimate = value,
+                                                    confidence_interval = ci,
+                                                    limit = "upper"),
+         lower_limit = significant_change_calulator(estimate = value,
+                                                    confidence_interval = ci,
+                                                    limit = "lower"),
+         significant_change = ifelse(
+              # 0 not in positive interval & increased
+              lower_limit >= 0 & upper_limit >= 0 & value - lag(value) > 0, 1,
+              # 0 not in positive interval & decreased
+              ifelse(lower_limit >= 0 & upper_limit >= 0 & value - lag(value) < 0, -1,
+              # 0 not in negative interval & increased
+              ifelse(lower_limit < 0 & upper_limit < 0 & value - lag(value) > 0, 1,
+              # 0 not in negative interval & decreased - everything else maintaining
+              ifelse(lower_limit < 0 & upper_limit < 0 & value - lag(value) < 0, -1, 0))))) %>% 
+  na.omit() %>% 
+  group_by(area, period) %>% 
+  summarise(icon = sum(significant_change)) %>% 
+  mutate(icon = case_when(
+    icon == 2 ~ as.character(icon("arrow-up",lib = "glyphicon")),
+    icon == 1 ~ as.character(icon("arrow-up",lib = "glyphicon")),
+    icon == 0 ~ as.character(icon("minus",lib = "glyphicon")),
+    icon == -1 ~ as.character(icon("arrow-down",lib = "glyphicon")),
+    icon == -2 ~ as.character(icon("arrow-down",lib = "glyphicon"))),
+    variable = "Overall",
+    indicator = paste("Healthy Life Expectancy", as.character(icon("info-sign", lib = "glyphicon"))),
+    icon1 = icon,
+    icon2 = icon) %>% 
+  select(-period)
 
 ## ---------------------------------------------------------------
 ##               Population Change - Data Zones               --
 ## ---------------------------------------------------------------
 # Too large for one call
-# Build as list then unlist to speed up?
 
+# Call data with API
 pop_estimates_datazones <- opendatascot::ods_dataset(
   "population-estimates-2011-datazone-linked-dataset",
   geography = "dz",
@@ -254,66 +315,80 @@ pop_estimates_datazones <- opendatascot::ods_dataset(
     sex = "all",
     age = "all",
     refPeriod = as.character(c((current_year - 5):current_year))
-  )) %>%
+  ))
+
+# Clean data
+pop_change_by_data_zone <- pop_estimates_datazones %>%
   mutate("indicator" = "Population Change") %>%
   select(-measureType) %>%
   rename("zone" = refArea,
-         "period" = refPeriod) 
-
-
-pop_change_by_data_zone <- pop_estimates_datazones %>% 
-  group_by(zone) %>% 
-  arrange(period) %>% 
-  mutate(value = as.numeric(value),
-         period = as.numeric(period),
-         change = ifelse(value-lag(value) < 0, 1, 0),
-         "variable" = "% Decreased data zones") %>% 
-  filter(period != 2008) %>% 
+         "period" = refPeriod) %>%
+  group_by(zone) %>%
+  arrange(period) %>%
+  mutate(
+    value = as.numeric(value),
+    period = as.numeric(period),
+    change = ifelse(value - lag(value) < 0, 1, 0),
+    "variable" = "% Decreased data zones"
+  ) %>%
+  filter(period != 2008) %>%
   
-  left_join(data_zone_lookup, by = c("zone" = "DZ2011_Code")) %>%  
-  rename("area" = LA_Name) %>% 
-  group_by(area, period, variable) %>% 
-  summarise(value = sum(change)) %>% 
+  left_join(data_zone_lookup, by = c("zone" = "DZ2011_Code")) %>%
+  rename("area" = LA_Name) %>%
+  group_by(area, period, variable) %>%
+  summarise(value = sum(change)) %>%
   
-  rbind(pop_estimates_datazones %>% 
-          group_by(zone) %>% 
-          arrange(period) %>% 
-          mutate(value = as.numeric(value),
-                 change = ifelse(value-lag(value) < 0, 1, 0),
-                 "variable" = "% Decreased data zones") %>% 
-          filter(period != 2008) %>% 
-          group_by(period, variable) %>% 
-          summarise(value = sum(change)) %>% 
-  mutate(area = "Scotland",
-         "period" = as.numeric(period))) %>% 
+  rbind(
+    pop_estimates_datazones %>%
+      group_by(zone) %>%
+      arrange(period) %>%
+      mutate(
+        value = as.numeric(value),
+        change = ifelse(value - lag(value) < 0, 1, 0),
+        "variable" = "% Decreased data zones"
+      ) %>%
+      filter(period != 2008) %>%
+      group_by(period, variable) %>%
+      summarise(value = sum(change)) %>%
+      mutate(area = "Scotland",
+             "period" = as.numeric(period))
+  ) %>%
   
-  rbind(pop_estimates_datazones %>% 
-          group_by(zone) %>% 
-          arrange(period) %>% 
-          mutate(value = as.numeric(value),
-                 period = as.numeric(period),
-                 change = ifelse(value-lag(value) < 0, 0, 1),
-                 "variable" = "% Increased data zones") %>% 
-          filter(period != 2008) %>% 
-          
-          left_join(data_zone_lookup, by = c("zone" = "DZ2011_Code")) %>%  
-          rename("area" = LA_Name) %>% 
-          group_by(area, period, variable) %>% 
-          summarise(value = sum(change)) %>% 
-          
-          rbind(pop_estimates_datazones %>% 
-                  group_by(zone) %>% 
-                  arrange(period) %>% 
-                  mutate(value = as.numeric(value),
-                         change = ifelse(value-lag(value) < 0, 0, 1),
-                         "variable" = "% Increased data zones") %>% 
-                  filter(period != 2008) %>% 
-                  group_by(period, variable) %>% 
-                  summarise(value = sum(change)) %>% 
-                  mutate(area = "Scotland",
-                         "period" = as.numeric(period)))) %>% 
-  group_by(area, period,) %>% 
-  mutate(value = round((value/sum(value))*100, digits = 2),
+  rbind(
+    pop_estimates_datazones %>%
+      group_by(zone) %>%
+      arrange(period) %>%
+      mutate(
+        value = as.numeric(value),
+        period = as.numeric(period),
+        change = ifelse(value - lag(value) < 0, 0, 1),
+        "variable" = "% Increased data zones"
+      ) %>%
+      filter(period != 2008) %>%
+      
+      left_join(data_zone_lookup, by = c("zone" = "DZ2011_Code")) %>%
+      rename("area" = LA_Name) %>%
+      group_by(area, period, variable) %>%
+      summarise(value = sum(change)) %>%
+      
+      rbind(
+        pop_estimates_datazones %>%
+          group_by(zone) %>%
+          arrange(period) %>%
+          mutate(
+            value = as.numeric(value),
+            change = ifelse(value - lag(value) < 0, 0, 1),
+            "variable" = "% Increased data zones"
+          ) %>%
+          filter(period != 2008) %>%
+          group_by(period, variable) %>%
+          summarise(value = sum(change)) %>%
+          mutate(area = "Scotland",
+                 "period" = as.numeric(period))
+      )
+  ) %>%
+  group_by(area, period, ) %>%
+  mutate(value = round((value / sum(value)) * 100, digits = 2),
          "indicator" = "Population Change")
 
 ## ---------------------------------------------------------------
@@ -339,10 +414,6 @@ mutate(area = gsub("Total Moves within Scotland3", "Scotland", area),
 ##                      Net rest of the UK                      --
 ## ----------------------------------------------------------------
 
-# net_ruk_scotland <- opendatascot:::ods_query_database(endpoint, net_ruk_query) %>% 
-#   mutate("  " = "Net Migration - Rest of UK")
-
-
 net_ruk <- readxl::read_xlsx(file_path_ruk,
                                    sheet = "Net-Council-Sex (2001-)",
                                   range = "A5:T38") %>% 
@@ -362,8 +433,7 @@ net_ruk <- readxl::read_xlsx(file_path_ruk,
 
 net_overseas <- readxl::read_excel(file_path_net_overseas,
                                    sheet = "Net-Council Area-Sex",
-                                   range = c("B5:T38")
-) %>% 
+                                   range = c("B5:T38")) %>% 
   tidyr::pivot_longer(2:19, names_to = "period", values_to = "value") %>% 
   select("area" = `...1`, 
          period, 
@@ -376,12 +446,9 @@ net_overseas <- readxl::read_excel(file_path_net_overseas,
          ) %>% 
   filter(period >= 2009)
 
-
-
 ## ----------------------------------------------------------------
 ##                     Total Net Migration                      --
 ## ----------------------------------------------------------------
-
 
 total_net_migration <- opendatascot:::ods_query_database(endpoint, 
                                                          net_migration_query) %>%
@@ -392,47 +459,36 @@ total_net_migration <- opendatascot:::ods_query_database(endpoint,
 ## ----------------------------------------------------------------
 ##                     Components of Change                     --
 ## ----------------------------------------------------------------
-## Natural change + net migration + other changes
-## one year - potentially show 2 years
 
 natural_change <- readxl::read_excel(file_path_natural_change) %>% 
   select(period = Year,
          area = Area,
          value = `Natural Change`)  %>%
   mutate("variable" = "Natural Change",
-         "indicator" = "Population Change")
-
-##################################################################
-##                         Combine Data                         ##
-##################################################################
-active_dependency_ratio <- adr %>% 
-  mutate("variable" = paste0(age, sex)) %>% 
-  select(-c(age, sex)) %>%  
-  mutate(indicator = paste(indicator, 
-                           as.character(icon("info-sign", 
-                                             lib = "glyphicon")))) %>% 
-  group_by(area, variable, indicator) %>% 
-  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
-  
-combined_datasets <- rbind(pop_change_by_council_area,
-  pop_change_by_data_zone) %>%
-  mutate(variable = paste(variable, 
-                          as.character(icon("info-sign", 
-                                            lib = "glyphicon")))) %>%
-  rbind(healthy_life_expectancy,
-        life_expectancy) %>%  
-  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
-  group_by(area, variable, indicator) %>% 
-  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
-
-
-
-natural_change <- natural_change %>%
-  mutate(variable = paste(variable, as.character(icon("info-sign", lib = "glyphicon"))),
+         "indicator" = "Population Change",
+         variable = paste(variable, as.character(icon("info-sign", lib = "glyphicon"))),
          indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
   group_by(area, variable, indicator) %>% 
   tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
 
+
+##################################################################
+##                         Combine Datasets                     ##
+##################################################################
+  
+pop_change <- rbind(pop_change_by_council_area,
+  pop_change_by_data_zone) %>%
+  mutate(variable = paste(variable, 
+                          as.character(icon("info-sign", lib = "glyphicon")))) %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
+
+
+life_expectancies <- rbind(healthy_life_expectancy,
+        life_expectancy) %>%  
+  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
 
 migration_datasets <-  net_ruk %>%
   rbind(total_net_migration,
@@ -442,6 +498,3 @@ migration_datasets <-  net_ruk %>%
          indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
   group_by(area, variable, indicator) %>% 
   tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
-
-
-
