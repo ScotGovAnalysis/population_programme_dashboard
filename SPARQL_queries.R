@@ -39,10 +39,38 @@ where { ?data qb:dataSet
 }order by ?refPeriod")
 
 
+# Life expectancy confidence intervals -------------------------------------------------
+
+le_query_ci <- "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?area ?period ?age ?sex ?lower_ci ?upper_ci
+WHERE {
+  ?obs <http://purl.org/linked-data/cube#dataSet>
+  <http://statistics.gov.scot/data/Life-Expectancy> .
+ ?obs <http://purl.org/linked-data/sdmx/2009/dimension#refArea> ?areauri .
+ ?obs <http://purl.org/linked-data/sdmx/2009/dimension#refPeriod> ?perioduri .
+ ?obs <http://statistics.gov.scot/def/measure-properties/95-lower-confidence-limit> ?lower_ci .
+ ?obs <http://statistics.gov.scot/def/measure-properties/95-lower-confidence-limit> ?upper_ci .
+ ?obs <http://statistics.gov.scot/def/dimension/urbanRuralClassification> ?urbanRuralClassification .
+ ?obs <http://statistics.gov.scot/def/dimension/simdQuintiles> ?simdQuintiles .
+ ?obs <http://statistics.gov.scot/def/dimension/age> ?ageuri .
+ ?obs <http://statistics.gov.scot/def/dimension/sex> ?sexuri .
+ ?areauri rdfs:label ?area .
+ ?perioduri rdfs:label ?period .
+ ?ageuri rdfs:label ?age .
+ ?sexuri rdfs:label ?sex .
+ FILTER (strstarts(strafter(str(?areauri),
+        'http://statistics.gov.scot/id/statistical-geography/'),'S12')
+      ||strstarts(strafter(str(?areauri),
+        'http://statistics.gov.scot/id/statistical-geography/'),'S92')). 
+ FILTER regex(?age,'^0 years') .
+ FILTER (regex(str(?urbanRuralClassification ), 'all$')) .
+ FILTER (regex(str(?simdQuintiles ), 'all$')) .
+} order by ?period"
+
 # Life expectancy -------------------------------------------------
 
 le_query <- "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?area ?period ?age ?value ?sex
+SELECT ?area ?period ?age ?sex ?value
 WHERE {
   ?obs <http://purl.org/linked-data/cube#dataSet>
   <http://statistics.gov.scot/data/Life-Expectancy> .
@@ -66,7 +94,9 @@ WHERE {
  FILTER (regex(str(?simdQuintiles ), 'all$')) .
 } order by ?period"
 
-
+# ?obs <http://statistics.gov.scot/def/measure-properties/count> ?value .
+# ?obs <http://statistics.gov.scot/def/measure-properties/95-lower-confidence-limit> ?lower_ci .
+# ?obs <http://statistics.gov.scot/def/measure-properties/95-lower-confidence-limit> ?upper_ci .
 # Healthy life expectancy -------------------------------------------------
 
 # Using SPARQL to join the area names
