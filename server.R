@@ -42,14 +42,10 @@ server <- function(input, output, session) {
                               icon = "")
     
     council1_symbol <- create_symbols_council1(net_within_scotland,
-                                               council1,
-                                               "arrow-up",
-                                               "arrow-down")
+                                               council1)
     
     council2_symbol <- create_symbols_council2(net_within_scotland,
-                                               council2,
-                                               "arrow-up",
-                                               "arrow-down")
+                                               council2)
     
     combine_columns_and_symbols_within_scot(net_within_scotland, 
                                 council1, 
@@ -69,19 +65,13 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_symbol <- create_symbols_scotland(pop_structure_age,
-                                               "arrow-up",
-                                               "arrow-down")
+    scotland_symbol <- create_symbols_scotland(pop_structure_age)
     
     council1_symbol <- create_symbols_council1(pop_structure_age,
-                                               council1,
-                                               "arrow-up",
-                                               "arrow-down")
+                                               council1)
     
     council2_symbol <- create_symbols_council2(pop_structure_age,
-                                               council2,
-                                               "arrow-up",
-                                               "arrow-down")
+                                               council2)
     
     combine_columns_and_symbols(pop_structure_age, 
                                council1, 
@@ -100,19 +90,13 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_symbol <- create_symbols_scotland(active_dependency_ratio,
-                                               "thumbs-down",
-                                               "thumbs-up")
+    scotland_symbol <- create_symbols_scotland(active_dependency_ratio)
     
     council1_symbol <- create_symbols_council1(active_dependency_ratio,
-                                               council1,
-                                               "thumbs-down",
-                                               "thumbs-up")
+                                               council1)
     
     council2_symbol <- create_symbols_council2(active_dependency_ratio,
-                                               council2,
-                                               "thumbs-down",
-                                               "thumbs-up")
+                                               council2)
     
     combine_columns_and_symbols(active_dependency_ratio, 
                                council1, 
@@ -130,19 +114,13 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
 
-    scotland_symbol <- create_symbols_scotland(life_expectancies,
-                                               "thumbs-down",
-                                               "thumbs-up")
+    scotland_symbol <- create_symbols_scotland(life_expectancies)
 
     council1_symbol <- create_symbols_council1(life_expectancies,
-                                               council1,
-                                               "thumbs-down",
-                                               "thumbs-up")
+                                               council1)
 
     council2_symbol <- create_symbols_council2(life_expectancies,
-                                               council2,
-                                               "thumbs-down",
-                                               "thumbs-up")
+                                               council2)
 
     combine_columns_and_symbols(life_expectancies,
                                council1,
@@ -159,19 +137,13 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_symbol <- create_symbols_scotland(migration_datasets,
-                                               "thumbs-up",
-                                               "thumbs-down")
+    scotland_symbol <- create_symbols_scotland(migration_datasets)
     
     council1_symbol <- create_symbols_council1(migration_datasets,
-                                               council1,
-                                               "thumbs-up",
-                                               "thumbs-down")
+                                               council1)
     
     council2_symbol <- create_symbols_council2(migration_datasets,
-                                               council2,
-                                               "thumbs-up",
-                                               "thumbs-down")
+                                               council2)
     
     combine_columns_and_symbols(migration_datasets, 
                                 council1, 
@@ -189,19 +161,13 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_symbol <- create_symbols_scotland(natural_change,
-                                               "thumbs-up",
-                                               "thumbs-down")
+    scotland_symbol <- create_symbols_scotland(natural_change)
     
     council1_symbol <- create_symbols_council1(natural_change,
-                                               council1,
-                                               "thumbs-up",
-                                               "thumbs-down")
+                                               council1)
     
     council2_symbol <- create_symbols_council2(natural_change,
-                                               council2,
-                                               "thumbs-up",
-                                               "thumbs-down")
+                                               council2)
     
     combine_columns_and_symbols(natural_change, 
                                 council1, 
@@ -219,19 +185,13 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_symbol <- create_symbols_scotland(pop_change,
-                                               "thumbs-up",
-                                               "thumbs-down")
+    scotland_symbol <- create_symbols_scotland(pop_change)
     
     council1_symbol <- create_symbols_council1(pop_change,
-                                               council1,
-                                               "thumbs-up",
-                                               "thumbs-down")
+                                               council1)
     
     council2_symbol <- create_symbols_council2(pop_change,
-                                               council2,
-                                               "thumbs-up",
-                                               "thumbs-down")
+                                               council2)
     
     combine_columns_and_symbols(pop_change, 
                                 council1, 
@@ -254,8 +214,8 @@ server <- function(input, output, session) {
       rbind(active_dependency_ratio_reactive(),
             life_expectancies_reactive(),
             pop_change_reactive(),
-            net_within_scot_reactive(),
             natural_change_reactive(),
+            net_within_scot_reactive(),
             migration_reactive())
     
     colnames(data)[c(1,2, 4, 6, 8)] <- paste0('<span style="color:',"white",'">',
@@ -307,9 +267,8 @@ server <- function(input, output, session) {
   output$key <- renderText({
 paste(as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
        as.character(icon("arrow-down", lib = "glyphicon")), "Decreasing,",
-       as.character(icon("thumbs-up", lib = "glyphicon")), "Improving,",
-       as.character(icon("thumbs-down", lib = "glyphicon")), "Worsening,",
        as.character(icon("minus", lib = "glyphicon")), "Maintaining", br(),
+      "The arrows show the latest year vs the previous year", br(),
        "<b>", "*Data range is", current_year-12, "-", current_year-2, "\b"
        )
     
