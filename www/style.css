@@ -2,8 +2,8 @@
 
 body {
     font-size: 18px;
-    color: #333;
-    background-color: #fff;
+    color: #333e38;
+    background-color: #ffffff;
 }
 
 .navbar-default {
@@ -12,12 +12,12 @@ body {
 }
 
 .navbar-default .navbar-brand {
-                         color: #333333;
+                         color: #333e38;
     
 }
 a:focus {
     background-color: #fdd522 !important;
-    color: #333333 !important;
+    color: #333e38 !important;
     outline-offset: 0;
     transition-duration: 0s;
 }
