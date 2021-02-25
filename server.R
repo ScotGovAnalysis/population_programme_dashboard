@@ -4,9 +4,11 @@
 
 server <- function(input, output, session) {
   
-  url <- a("Population Taskforce", 
-           href = "https://www.gov.scot/groups/population-task-force/", 
-           target="_blank")
+  
+  output$markdown <- renderUI(includeHTML("about_page.html"))
+  
+  url <- a(HTML("<u>Population Taskforce</u>"), 
+           href = "https://www.gov.scot/groups/population-task-force/")
   
   output$subheader <- renderUI({
     tagList(
@@ -285,86 +287,6 @@ paste(as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
                geom_line()
   )
   )
-
-##################################################################
-##                           Criteria                           ##
-##################################################################
-  
-  output$pop_size <- renderUI(
-    HTML(
-      "Population aged under 16, population aged 16 to 64 and population
-      aged 65 and over:
-    <ul><li>Population increasing if proportion of the population has
-    increased.</li>
-    <li>Population maintaining if proportion of the population has not
-    changed.</li>
-    <li>Population decreasing if proportion of the population has
-      decreased.</ul>"
-    )
-  )
-  
-  output$healthy_life_expectancy <- renderUI(
-    HTML(
-      "Average number of years a new born baby could be expected to live in
-      ‘good’ or ‘very good’ health:
-    <ul><li>Performance improving if both male and female HLE has significantly
-increased or if HLE of one sex has significantly increased and there hasn’t
-been a significant change in the other.</li>
-    <li>Performance maintaining if male and female HLE has significantly changed
-in opposite directions or if there hasn’t been a significant change for males
-and females.</li>
-    <li>Performance worsening if both male and female HLE has significantly
-decreased or if HLE of one sex has significantly decreased and there
-hasn’t been a significant change in the other.</ul>"
-    )
-  )
-  
-  output$active_dependency_ratio <- renderUI(
-    HTML(
-      "Number of economically inactive people (aged 16 and over) per 1,000
-economically active people (aged 16 and over):
-    <ul><li>Performance improving if ratio has increased.</li>
-    <li>Performance maintaining if ratio has not changed.</li>
-    <li>Performance worsening if ratio has decreased.</ul>"
-    )
-  )
-  
-  output$pop_change_by_council <- renderUI(
-    HTML(
-      "Number of councils experiencing population decline:
-    <ul><li>Performance improving if number of councils has decreased.</li>
-    <li>Performance maintaining if number of councils has not changed.</li>
-    <li>Performance worsening if number of councils has increased.</ul>"
-    )
-  )
-  
-#################################################################
-##                          About Tab                          ##
-#################################################################
-  
-  
-  output$pop_change_within_council <- renderUI(
-    HTML(
-      "Percentage of data zones (small areas) within each council experiencing
-population decline:
-    <ul><li>Performance improving if percentage of data zones has
-    decreased.</li>
-    <li>Performance maintaining if percentage of data zones has not
-    changed.</li>
-    <li>Performance worsening if percentage of data zones has increased.</ul>"
-    )
-  )
-  
-  output$about <- renderUI(
-    HTML(
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum."
-    )
-  )
   
 }
+
