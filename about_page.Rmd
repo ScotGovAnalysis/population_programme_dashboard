@@ -1,0 +1,100 @@
+---
+title: "About"
+lang: "en"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+
+A <a href = 'https://www.gov.scot/groups/population-task-force/'>
+      <u>Population Taskforce</u></a> and Population Programme were established in June 2019 by the Scottish Government to consider Scotland’s future population challenges.
+
+The <a href = 'https://nationalperformance.gov.scot/'><u>National Performance 
+      Framework</u></a> (NPF) includes an indicator on Scotland’s population under the National Outcome “we are open, connected and make a positive contribution internationally”. This dashboard includes the NPF indicator as well as a number of other indicators to monitor progress and understand the challenges facing the population programme. These are structured around population structure and distribution, priority areas agreed by the Population Taskforce.
+
+As agreed by the Population Taskforce, the Scottish Government’s aim is to make communities across Scotland attractive places to live, work, bring up families and to move to; so that Scotland’s population profile improves sustainable and inclusive economic growth and wellbeing.
+
+
+## Definitions  
+### Population structure  
+#### Age  
+### Active dependency ratio  
+Number of economically inactive people (aged 16 and over) per 1,000 economically active people (aged 16 and over):  
+
+* Performance improving if ratio has increased.  
+* Performance maintaining if ratio has not changed.  
+* Performance worsening if ratio has decreased.  
+  
+### Life expectancy  
+Average number of years a new born baby could be expected to live:
+
+* Performance improving if both male and female LE has significantly increased or if LE of one sex has significantly increased and there hasn’t been a significant change in the other.  
+* Performance maintaining if male and female LE has significantly changed in opposite directions or if there hasn’t been a significant change for males and females.  
+* Performance worsening if both male and female LE has significantly decreased or if LE of one sex has significantly decreased and there hasn’t been a significant change in the other.  
+  
+### Healthy life expectancy  
+Average number of years a new born baby could be expected to live in ‘good’ or ‘very good’ health: 
+
+  * Performance improving if both male and female HLE has significantly increased or if HLE of one sex has significantly increased and there hasn’t been a significant change in the other.
+  * Performance maintaining if male and female HLE has significantly changed in opposite directions or if there hasn’t been a significant change for males and females.
+  * Performance worsening if both male and female HLE has significantly decreased or if HLE of one sex has significantly decreased and there hasn’t been a significant change in the other. 
+  
+### Population change  
+#### Council area  
+Number of councils experiencing population increase or decline:  
+
+  * Performance improving if number of councils increasing has increased.  
+  * Performance improving if number of councils decreasing has decreased.  
+  * Performance maintaining if number of councils has not changed.  
+  * Performance worsening if number of councils decreasing has increased.  
+  * Performance worsening if number of councils increasing has decreased.  
+  
+#### Data zone  
+Percentage of datazones (small areas) experiencing population increase or decline:  
+
+  * Performance improving if percentage of datazones increasing has increased.  
+  * Performance improving if percentage of datazones decreasing has decreased.  
+  * Performance maintaining if percentage of datazones has not changed.  
+  * Performance worsening if percentage of datazones decreasing has increased.  
+  * Performance worsening if percentage of datazones increasing has decreased.  
+  
+#### Natural Change  
+The number of births minus the number of deaths:  
+
+  * Performance improving if natural change has increased.  
+  * Performance maintaining if natural change has not changed.  
+  * Performance worsening if natural change has decreased.  
+  
+### Net Migration  
+#### Within Scotland  
+The number of births minus the number of deaths:  
+
+  * Performance improving if natural change has increased.  
+  * Performance maintaining if natural change has not changed.  
+  * Performance worsening if natural change has decreased.  
+  
+#### Rest of the UK   
+The number of births minus the number of deaths:  
+
+  * Performance improving if natural change has increased.  
+  * Performance maintaining if natural change has not changed.  
+  * Performance worsening if natural change has decreased.  
+  
+#### Overseas  
+The number of births minus the number of deaths:  
+
+  * Performance improving if natural change has increased.  
+  * Performance maintaining if natural change has not changed.  
+  * Performance worsening if natural change has decreased.  
+  
+#### Total  
+The number of births minus the number of deaths:  
+
+  * Performance improving if natural change has increased.  
+  * Performance maintaining if natural change has not changed.  
+  * Performance worsening if natural change has decreased.  
