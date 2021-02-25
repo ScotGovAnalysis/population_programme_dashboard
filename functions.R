@@ -78,20 +78,19 @@ create_symbols_scotland <- function(data){
   data %>%
     filter(area == "Scotland") %>%
     group_by(indicator, variable) %>%
-    arrange(desc(period)) %>%
+    arrange(period) %>%
     filter(!is.na(value)) %>% 
     slice_max(period, n = 2) %>%
-    mutate(change = ifelse(stringr::str_detect(variable, "Decreased"),
-                           ifelse(value - lag(value) > 0, 2,
-                                  ifelse(value - lag(value) < 0, 1, 0)),
-                           ifelse(value - lag(value) > 0, 1,
-                                  ifelse(value - lag(value) < 0, 2, 0)))) %>%
+    arrange(period) %>%
+    mutate(change = case_when(value < lag(value) ~ 1,
+                              value > lag(value) & value < 0 ~ 0,
+                              value > lag(value) & value > 0 ~ 2,
+                              value == lag(value) ~ 0)) %>%
     filter(!is.na(change)) %>%
-    mutate(icon = ifelse(change == 1,
-      as.character(icon("arrow-down", lib = "glyphicon")),
-      ifelse(change == 2, 
-             as.character(icon("arrow-up",lib = "glyphicon")),
-             as.character(icon("minus", lib = "glyphicon"))))) %>%
+    mutate(icon = case_when(
+      change == 1 ~ as.character(icon("arrow-down", lib = "glyphicon")),
+      change == 2  ~ as.character(icon("arrow-up",lib = "glyphicon")),
+      change == 0 ~ as.character(icon("minus", lib = "glyphicon")))) %>%
     ungroup() %>%
     select(variable, icon)
 }
@@ -105,17 +104,16 @@ create_symbols_council1 <- function(data, council){
     arrange(desc(period)) %>%
     filter(!is.na(value)) %>%
     slice_max(period, n = 2) %>%
-    mutate(change = ifelse(stringr::str_detect(variable, "Decreased"),
-                           ifelse(value - lag(value) > 0, 2,
-                                  ifelse(value - lag(value) < 0, 1, 0)),
-                           ifelse(value - lag(value) > 0, 1,
-                                  ifelse(value - lag(value) < 0, 2, 0)))) %>%
+    arrange(period) %>%
+    mutate(change = case_when(value < lag(value) ~ 1,
+                                     value > lag(value) & value < 0 ~ 0,
+                                     value > lag(value) & value > 0 ~ 2,
+                                     value == lag(value) ~ 0)) %>%
     filter(!is.na(change)) %>%
-    mutate(icon1 = ifelse(change == 1,
-      as.character(icon("arrow-down",lib = "glyphicon")),
-      ifelse(change == 2,
-             as.character(icon("arrow-up",lib = "glyphicon")),
-             as.character(icon("minus",lib = "glyphicon"))))) %>%
+    mutate(icon1 = case_when(
+      change == 1 ~ as.character(icon("arrow-down", lib = "glyphicon")),
+      change == 2 ~ as.character(icon("arrow-up",lib = "glyphicon")),
+      change == 0 ~ as.character(icon("minus", lib = "glyphicon")))) %>%
     ungroup() %>%
     select(variable, icon1)
 }
@@ -131,17 +129,16 @@ create_symbols_council2 <- function(data, council){
     slice_max(period, n = 2) %>%
     # Assign the change direction since previous year 
     # Reveresed for Decreased population change 
-    mutate(change = ifelse(stringr::str_detect(variable, "Decreased"),
-                           ifelse(value - lag(value) > 0, 2,
-                                  ifelse(value - lag(value) < 0, 1, 0)),
-                           ifelse(value - lag(value) > 0, 1,
-                                  ifelse(value - lag(value) < 0, 2, 0)))) %>%
+    arrange(period) %>%
+    mutate(change = case_when(value < lag(value) ~ 1,
+                              value > lag(value) & value < 0 ~ 0,
+                              value > lag(value) & value > 0 ~ 2,
+                              value == lag(value) ~ 0)) %>%
     filter(!is.na(change)) %>%
-    mutate(icon2 = ifelse(
-      change == 1,
-      as.character(icon("arrow-down", lib = "glyphicon")),
-      ifelse(change == 2, as.character(icon("arrow-up", lib = "glyphicon")),
-             as.character(icon("minus", lib = "glyphicon"))))) %>%
+    mutate(icon2 = case_when(
+      change == 1 ~ as.character(icon("arrow-down", lib = "glyphicon")),
+      change == 2  ~ as.character(icon("arrow-up",lib = "glyphicon")),
+      change == 0 ~ as.character(icon("minus", lib = "glyphicon")))) %>%
     ungroup() %>%
     select(variable, icon2)
 }
