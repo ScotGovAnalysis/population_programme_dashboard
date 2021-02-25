@@ -68,7 +68,7 @@ ui <- navbarPage(
   tabPanel(
     "About",
     icon = icon("info-circle"),
-    uiOutput("inc")
+    uiOutput("markdown")
   ),
   
   tabPanel(
