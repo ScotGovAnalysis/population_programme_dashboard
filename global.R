@@ -11,7 +11,7 @@ library(opendatascot)
 #################################################################
 ##                          Variables                          ##
 #################################################################
-
+last_update <- HTML("Last updated: <b>25th February 2021<b/>")
 # File paths for static data files
 file_path_hle <- "data/HLE.xlsx"
 # Net Migration within Scotland
