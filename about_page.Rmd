@@ -1,8 +1,9 @@
 ---
-title: "About"
+title: About
 lang: "en"
 output:
   html_document:
+    css: www/style.css
     toc: yes
     toc_depth: 3
     toc_float:
@@ -10,21 +11,26 @@ output:
       smooth_scroll: no
 ---
 
+A <a href = 'https://www.gov.scot/groups/population-task-force/'><u>Population Taskforce</u></a> and Population Programme were established in June 2019 by the Scottish Government to consider Scotland’s future population challenges.
 
-A <a href = 'https://www.gov.scot/groups/population-task-force/'>
-      <u>Population Taskforce</u></a> and Population Programme were established in June 2019 by the Scottish Government to consider Scotland’s future population challenges.
+The <a href = 'https://nationalperformance.gov.scot/'><u>National Performance Framework</u></a> (NPF) includes an indicator on Scotland’s population under the National Outcome “we are open, connected and make a positive contribution internationally”. This dashboard includes the NPF indicator as well as a number of other indicators to monitor progress and understand the challenges facing the population programme. These are structured around population structure and distribution, priority areas agreed by the Population Taskforce.
 
-The <a href = 'https://nationalperformance.gov.scot/'><u>National Performance 
-      Framework</u></a> (NPF) includes an indicator on Scotland’s population under the National Outcome “we are open, connected and make a positive contribution internationally”. This dashboard includes the NPF indicator as well as a number of other indicators to monitor progress and understand the challenges facing the population programme. These are structured around population structure and distribution, priority areas agreed by the Population Taskforce.
+As agreed by the Population Taskforce, the Scottish Government’s aim is to make communities across Scotland attractive places to live, work, bring up families and to move to; so that Scotland’s population profile improves sustainable and inclusive economic growth and wellbeing.  
 
-As agreed by the Population Taskforce, the Scottish Government’s aim is to make communities across Scotland attractive places to live, work, bring up families and to move to; so that Scotland’s population profile improves sustainable and inclusive economic growth and wellbeing.
+## Contact
 
+We welcome your feedback to improve this website:
+
+* Email: <u>joe.bloggs@gov.scot</u>
+* Phone: 0300 244 4000 (Scottish Government central enquiry unit)
+* Scottish Government <a href = 'https://www.gov.scot/about/contact-information/'><u>general enquiries</u></a>  
 
 ## Definitions  
 ### Population structure  
-#### Age  
+Proportion of children, people aged 16 - 64, and people 65 and over.
+
 ### Active dependency ratio  
-Number of economically inactive people (aged 16 and over) per 1,000 economically active people (aged 16 and over):  
+Number of economically inactive people aged 16 and over that are economically inactive per 1,000 economically active:  
 
 * Performance improving if ratio has increased.  
 * Performance maintaining if ratio has not changed.  
@@ -72,29 +78,29 @@ The number of births minus the number of deaths:
   
 ### Net Migration  
 #### Within Scotland  
-The number of births minus the number of deaths:  
+Net migration from other areas within Scotland:  
 
-  * Performance improving if natural change has increased.  
-  * Performance maintaining if natural change has not changed.  
-  * Performance worsening if natural change has decreased.  
+  * Performance improving if within Scotland migration has increased.  
+  * Performance maintaining if within Scotland migration has not changed.  
+  * Performance worsening if within Scotland migration has decreased.  
   
 #### Rest of the UK   
-The number of births minus the number of deaths:  
+Net migration from the rest of the UK:  
 
-  * Performance improving if natural change has increased.  
-  * Performance maintaining if natural change has not changed.  
-  * Performance worsening if natural change has decreased.  
+  * Performance improving if rest of the UK migration has increased.  
+  * Performance maintaining if rest of the UK migration has not changed.  
+  * Performance worsening if rest of the UK migration has decreased.  
   
 #### Overseas  
-The number of births minus the number of deaths:  
+Net migration from outside the UK:  
 
-  * Performance improving if natural change has increased.  
-  * Performance maintaining if natural change has not changed.  
-  * Performance worsening if natural change has decreased.  
+  * Performance improving if overseas migration has increased.  
+  * Performance maintaining if overseas migration has not changed.  
+  * Performance worsening if overseas migration has decreased.  
   
 #### Total  
-The number of births minus the number of deaths:  
+Net migration from other areas within Scotland and areas outwith Scotland:  
 
-  * Performance improving if natural change has increased.  
-  * Performance maintaining if natural change has not changed.  
-  * Performance worsening if natural change has decreased.  
+  * Performance improving if total migration has increased.  
+  * Performance maintaining if total migration has not changed.  
+  * Performance worsening if total migration has decreased.  
