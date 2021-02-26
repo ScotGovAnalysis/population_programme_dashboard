@@ -1,12 +1,17 @@
-ui <- navbarPage(
+ui <- navbarPage(  
+                   
   # Sourcing custom CSS ----
   tags$head(includeCSS("www/style.css")),
   
-  windowTitle = "Population Programme",
+
+  windowTitle = "Population Dashboard",
   tabPanel(
     "Home",
     tags$html(lang = "en"),
     icon = icon("home"), 
+    HTML("<script src='https://cc.cdn.civiccomputing.com/8/cookieControl-8.x.min.js'></script>"),
+    HTML("<script async src='https://www.googletagmanager.com/gtag/js?id=UA-91956629-1'></script>"),
+    tags$script(src = "cookie_control_config.js"),
     
     #mainPanel(
     fluidRow(column(2),
@@ -68,13 +73,18 @@ ui <- navbarPage(
   tabPanel(
     "About",
     icon = icon("info-circle"),
-    uiOutput("markdown")
+    uiOutput("about")
   ),
   
   tabPanel(
     "Accessibility",
-    icon = icon("universal-access"))
-)
+    icon = icon("universal-access"),
+  #   column(2),
+  # column(8,
+  #        uiOutput("access")),
+  # column(2)
+  uiOutput("accessibility")
+))
 
 
 # tabPanel(tags$a(img(src = "scotgovlogo.svg",
