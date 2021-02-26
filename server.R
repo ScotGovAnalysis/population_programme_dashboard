@@ -5,8 +5,8 @@
 server <- function(input, output, session) {
   
   
-  output$about <- renderUI(includeHTML("about_page.html"))
-  output$accessibility <- renderUI(includeHTML("accessibility_page.html"))
+  output$about <- about_page 
+  #output$accessibility <- accessibility_page 
   
   url <- a(HTML("<u>Population Taskforce</u>"), 
            href = "https://www.gov.scot/groups/population-task-force/")
@@ -288,36 +288,6 @@ paste(as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
                geom_line()
   )
   )
-  
-#   output$access <- renderUI(
-# 
-# "<h1>Accessibility</H1>
-# Last updated: <b>15 March 2021</b><br>
-# This website is run by the Scottish Government.<br>
-# We want it to be accessible and usable for as many people as possible.<br>
-# <H2>Feedback</H2>
-# Contact us(URL for contact section in about page) if you:
-# <li>Cannot access any part of this site or want to report an accessibility problem.
-# <li>Need information on this website in a different format. Such as accessible PDF, large print, easy read, audio recording or braille. We’ll consider your request and get back to you as soon as we can.
-# <H3>Enforcement</H3>
-# If you’re not happy with how we respond to your feedback, contact the <a href = 'https://www.equalityadvisoryservice.com/'><u>Equality Advisory and Support Service</u></a>.
-# They are an independent advice service. They will advise you on what to do next.
-# <H2>Compliance</H2>
-# Scottish Government is committed to making its websites accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2)
-# <a href = 'http://www.legislation.gov.uk/uksi/2018/952/regulation/4/made'><u>Accessibility Regulations 2018</u></a>. <br>
-# This accessibility statement applies to the
-# <a href = 'https://scotland.shinyapps.io/population_programme_dashboard/'><u>Population Programme</u></a> data website.
-# <H3>Compliance status</H3>
-# This website is partially compliant with the regulations, due to the non-compliances listed below.
-# <H3>Non-accessible content</H3>
-# The content listed below is not-compliant with the regulations:
-# <li>Some charts in the detailed analysis contain text that is difficult for people using screen readers to access
-# <li>Some text does not appear in high contrast mode - mostly chart tooltips and annotations within charts
-# <H3>Preparation of statement</H3>
-# This statement was prepared on <b>15 March 2021</b>.<br>
-# These web pages were reviewed <b>February 2021</b>."
-#     )
-  #)
   
   
 }

@@ -89,6 +89,10 @@ variable_order <- c("Children (under 16 years)",
 
 source("SPARQL_queries.R")
 source("functions.R")
+
+about_page <- renderUI(includeHTML("about_page.html"))
+#accessibility_page <- renderUI(includeHTML("accessibility_page.html"))
+
 ##################################################################
 ##                       Reading Raw Data                       ##
 ##################################################################

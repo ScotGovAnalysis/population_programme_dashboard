@@ -5,6 +5,7 @@ output:
   html_document:
     css: www/style.css
 ---
+
 Last updated: <b>15 March 2021</b>
 
 This website is run by the Scottish Government.
@@ -13,7 +14,7 @@ We want it to be accessible and usable for as many people as possible.
 
 ## Feedback
 
-[Contact us](https://scotland.shinyapps.io/population_programme/#Contact) if you:
+<a href = 'https://scotland.shinyapps.io/population_programme/#Contact'><u>Contact us</u></a> if you:
 
 * Cannot access any part of this site or want to report an accessibility problem.  
 * Need information on this website in a different format. Such as accessible PDF, large print, easy read, audio recording or braille. We’ll consider your request and get back to you as soon as we can.  
