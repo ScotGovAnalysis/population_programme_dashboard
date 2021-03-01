@@ -8,7 +8,7 @@ server <- function(input, output, session) {
   # output$about <- about_page 
   # #output$accessibility <- accessibility_page 
   # 
-  url <- a(HTML("<u>Population Taskforce</u>"), 
+  url <- a(HTML("Population Taskforce"), 
            href = "https://www.gov.scot/groups/population-task-force/")
   
   output$subheader <- renderUI({
@@ -232,7 +232,7 @@ server <- function(input, output, session) {
       options = list(
         rowsGroup = list(0),
         drawCallback =  cb,
-        rowCallback = JS(rcb),
+        rowCallback = JS(tooltips),
         columnDefs = list(
           list( # sparkline columns
           className = 'dt-right',
@@ -268,11 +268,12 @@ server <- function(input, output, session) {
   
   
   output$key <- renderText({
-paste(as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
+paste("<b>How to read this chart</b>", br(),
+  as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
        as.character(icon("arrow-down", lib = "glyphicon")), "Decreasing,",
        as.character(icon("minus", lib = "glyphicon")), "Maintaining", br(),
-      "The arrows show the latest year vs the previous year", br(),
-       "<b>", "*Data range is", current_year-12, "-", current_year-2, "\b"
+      "The symbols represent the latest year vs the previous year", br(),
+       "<b>*Data range is", current_year-12, "-", current_year-2, "\b"
        )
     
   })
@@ -294,11 +295,11 @@ paste(as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
   output$about <- renderUI(
     HTML(
       "<h1>About</h1>
-      <p>A <a href = 'https://www.gov.scot/groups/population-task-force/'><u>Population Taskforce</u></a> 
+      <p>A <a href = 'https://www.gov.scot/groups/population-task-force/'>Population Taskforce</a> 
       and Population Programme were established in June 2019 by the Scottish Government to consider 
       Scotland’s future population challenges.</p>
       
-      <p>The <a href = 'https://nationalperformance.gov.scot/'><u>National Performance Framework</u></a> 
+      <p>The <a href = 'https://nationalperformance.gov.scot/'>National Performance Framework</a> 
       (NPF) includes an indicator on Scotland’s population under the National Outcome “we are open, 
       connected and make a positive contribution internationally”. This dashboard includes the NPF 
       indicator as well as a number of other indicators to monitor progress and understand the 
@@ -313,9 +314,9 @@ paste(as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
       
       <p>We welcome your feedback to improve this website:</p>
         
-      <ul><li>Email: <u>joe.bloggs@gov.scot</li></u>
+      <ul><li>Email: <a href = 'mailto:population@gov.scot'>population@gov.scot</a></li>
       <li>Phone: 0300 244 4000 (Scottish Government central enquiry unit)</li>
-      <li>Scottish Government <a href = 'https://www.gov.scot/about/contact-information/'><u>general enquiries</u></a></ul></li>  
+      <li>Scottish Government <a href = 'https://www.gov.scot/about/contact-information/'>general enquiries</a></ul></li>  
         
       <h2>Definitions</h2>
       <h3>Population structure</h3>  
@@ -411,28 +412,30 @@ paste(as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
         
         <h2>Feedback</h2>  
         
-        <a href = 'https://scotland.shinyapps.io/population_programme/#Contact'><u>Contact us</u></a> if you:  
+        <a href = 'https://scotland.shinyapps.io/population_programme/#Contact'>Contact us</a> if you:  
         
-        <ul><li>Cannot access any part of this site or want to report an accessibility problem.</li>
+        <ul>
+        <li>Cannot access any part of this site or want to report an accessibility problem.</li>
         <li>Need information on this website in a different format. Such as accessible PDF, large print, 
-        easy read, audio recording or braille. We’ll consider your request and get back to you as soon as we can.</li></ul>  
+        easy read, audio recording or braille. We’ll consider your request and get back to you as soon as we can.</li>
+        </ul>  
         
         <h3>Enforcement</h3>
         
         <p>If you’re not happy with how we respond to your feedback, contact the 
-        <a href = 'https://www.equalityadvisoryservice.com/'><u>Equality Advisory and Support Service</u></a>.
+        <a href = 'https://www.equalityadvisoryservice.com/'>Equality Advisory and Support Service</a>.
         They are an independent advice service. They will advise you on what to do next.</p>
         
         <h2>Compliance</h2>
         
         <p>Scottish Government is committed to making its websites accessible, in accordance with the 
         Public Sector Bodies (Websites and Mobile Applications) (No. 2) 
-        <a href = 'http://www.legislation.gov.uk/uksi/2018/952/regulation/4/made'><u>Accessibility 
-        Regulations 2018</u></a>.</p>
+        <a href = 'http://www.legislation.gov.uk/uksi/2018/952/regulation/4/made'>Accessibility 
+        Regulations 2018</a>.</p>
         
         <p>This accessibility statement applies to the 
-        <a href = 'https://scotland.shinyapps.io/population_dashboard/'><u>Population 
-        Programme</u></a> data website. </p>
+        <a href = 'https://scotland.shinyapps.io/population_dashboard/'>Population 
+        Programme</a> data website. </p>
         
         <h3>Compliance status</h3>
         
@@ -440,8 +443,11 @@ paste(as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
         <h3>Non-accessible content</h3>
         
         The content listed below is not-compliant with the regulations:  
-        <ul><li>The small charts in the Home page table are not accessible for screen readers.</li>
-        <li>Some text and shading does not appear in high contrast mode - mostly tooltips within the table.</li></ul>
+        <ul>
+        <li>The small charts in the Home page table are not accessible for screen readers.</li>
+        <li>Some text and shading does not appear in high contrast mode - mostly tooltips within the table.</li>
+        <li>.</li>
+        </ul>
         
         <h3>Preparation of statement</h3>
         

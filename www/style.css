@@ -1,20 +1,32 @@
 
-
 body {
     font-size: 18px;
     color: #333e38;
     background-color: #ffffff;
+    padding-top: 70px;
+}
+
+a {
+    color: #0065bd;
+    text-decoration: underline;
 }
 
 .navbar-default {
     background-color: #ffffff;
     border-color: #e7e7e7;
+    color: #333e38;
 }
 
-.navbar-default .navbar-brand {
-                         color: #333e38;
-    
+
+
+.navbar-default .navbar-brand, 
+.navbar-nav>li>a {
+    color: #333e38;
+    text-decoration: none;
 }
+
+
+
 a:focus {
     background-color: #fdd522 !important;
     color: #333e38 !important;
