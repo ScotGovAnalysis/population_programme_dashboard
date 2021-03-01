@@ -12,9 +12,6 @@ significant_change_calulator <- function(estimate,
 
 
 
-
-
-
 # TODO 6 different conditions for 3 icons 
 
 # Both increase = Improve
@@ -30,8 +27,9 @@ significant_change_calulator <- function(estimate,
 #################################################################
 ##                      Sparkline Formats                      ##
 #################################################################
-smile <- "<span style='font-size:100px;'>&#9785;</span>"
+
 # Format for LINE sparklines -----------------------------------------------
+
 sparkline_format <- function(type, y, x) {
   
   if(type == "line"){
@@ -143,7 +141,6 @@ create_symbols_council2 <- function(data, council){
     select(variable, icon2)
 }
 
-
 ##################################################################
 ##       Create data with sparklines and join the symbols       ##
 ##################################################################
@@ -220,7 +217,7 @@ combine_columns_and_symbols_within_scot <- function(data, x, y, a, b, c, type){
 }
 
 # Tooltips for the table
-rcb <- c(
+tooltips <- c(
   "function(row, data, num, index){",
   # Row 0 
         "   if(index === 0){",
@@ -264,4 +261,6 @@ rcb <- c(
   "  }else if(index === 16){",
   "    $('td:eq(1)', row).attr('title', 'Net migration from other areas within Scotland and areas outwith Scotland');",
   "  }}")
+
+
 
