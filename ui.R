@@ -1,4 +1,4 @@
-ui <- navbarPage(  
+ui <- navbarPage(position = "fixed-top",  
                    
   # Sourcing custom CSS ----
   tags$head(includeCSS("www/style.css")),
@@ -14,49 +14,38 @@ ui <- navbarPage(
     tags$script(src = "cookie_control_config.js"),
     
     #mainPanel(
-    fluidRow(column(2),
+    fluidRow(column(1),
              column(
-               10,
+               11,
                h1("Population Programme"),
                uiOutput("subheader")
              )),
     hr(),
-    fluidRow(
-      column(6),
-      column(
-        2,
-        selectInput(
-          "council_1",
-          label = "Council area selection 1:",
-          choices = council_areas$area,
-          selected = "Aberdeen City"
-        )
-      ),
-      column(
-        2,
-        selectInput(
-          "council_2",
-          label = "Council area selection 2:",
-          choices = council_areas$area,
-          selected = "Aberdeenshire"
-        )
-      ),
-      column(2)
-    ),
+    fluidRow(column(1),
+             column(6, uiOutput("key")), 
+             column(2,
+               selectInput(
+                 "council_1",
+                 label = "Select council area 1:",
+                 choices = council_areas$area,
+                 selected = "Aberdeen City")), 
+             column(2,
+               selectInput(
+                 "council_2",
+                 label = "Select council area 2:",
+                 choices = council_areas$area,
+                 selected = "Aberdeenshire")),
+             column(1)),
     
     htmlwidgets::getDependency('sparkline'),
-    
     fluidRow(
-      column(2),
-      column(8,
+      column(1),
+      column(10,
              align = "center",
              dataTableOutput("table1")),
-      column(2)),
-    
-    fluidRow(align = "center",
-             uiOutput("key"),
-             br(),
-             br())),
+      column(1)),
+    br(),
+    br()),
   
   # tabPanel(
   #   "Narrative",
