@@ -90,9 +90,6 @@ variable_order <- c("Children (under 16 years)",
 source("SPARQL_queries.R")
 source("functions.R")
 
-about_page <- renderUI(includeHTML("about_page.html"))
-#accessibility_page <- renderUI(includeHTML("accessibility_page.html"))
-
 ##################################################################
 ##                       Reading Raw Data                       ##
 ##################################################################
@@ -246,8 +243,8 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
 
 
 #TODO do this instead of the ordinary icon function
-
-# CI_healthy_life_expectancy <- datatable(readxl::read_xlsx(file_path_hle) %>% 
+# 
+# CI_healthy_life_expectancy <- datatable(readxl::read_xlsx(file_path_hle) %>%
 #   select("area" = Area_name,
 #          "period" = Period,
 #          "age" = `Age group`,
@@ -261,10 +258,10 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
 #          # sex = gsub('s', '', sex),
 #          age = "",
 #          period = (as.numeric(gsub("-.*", "", period))+1),
-#          "variable" = paste0(age, sex)) %>% 
-#   select(-c(age, sex)) %>% 
-#   filter(period %in% c(max(period), (max(period)-1))) %>% 
-#   group_by(variable, area) %>% 
+#          "variable" = paste0(age, sex)) %>%
+#   select(-c(age, sex)) %>%
+#   filter(period %in% c(max(period), (max(period)-1))) %>%
+#   group_by(variable, area) %>%
 #   mutate(ci = value - lower_ci,
 #          upper_limit = significant_change_calulator(estimate = value,
 #                                                     confidence_interval = ci,
@@ -280,10 +277,10 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
 #               # 0 not in negative interval & increased
 #               ifelse(lower_limit < 0 & upper_limit < 0 & value - lag(value) > 0, 1,
 #               # 0 not in negative interval & decreased - everything else maintaining
-#               ifelse(lower_limit < 0 & upper_limit < 0 & value - lag(value) < 0, -1, 0))))) %>% 
-#   na.omit() %>% 
-#   group_by(area, period) %>% 
-#   summarise(icon = sum(significant_change)) %>% 
+#               ifelse(lower_limit < 0 & upper_limit < 0 & value - lag(value) < 0, -1, 0))))) %>%
+#   na.omit() %>%
+#   group_by(area, period) %>%
+#   summarise(icon = sum(significant_change)) %>%
 #   mutate(icon = case_when(
 #     icon == 2 ~ as.character(icon("arrow-up",lib = "glyphicon")),
 #     icon == 1 ~ as.character(icon("arrow-up",lib = "glyphicon")),
@@ -293,7 +290,7 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
 #     variable = "Overall",
 #     indicator = paste("Healthy Life Expectancy", as.character(icon("info-sign", lib = "glyphicon"))),
 #     icon1 = icon,
-#     icon2 = icon) %>% 
+#     icon2 = icon) %>%
 #   select(-period), escape = F)
 
 ## ---------------------------------------------------------------
