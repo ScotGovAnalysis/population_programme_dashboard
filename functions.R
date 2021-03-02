@@ -233,7 +233,6 @@ tooltips <- c(
   "    $('td:eq(0)', row).attr('title', 'Average number of years a new born baby could be expected to live in ‘good’ or ‘very good’ health. Figures showing mid-year based on 3-year ranges.');",
   # Row 6
   "  }else if(index === 8){",
-  "    $('td:eq(0)', row).attr('title', 'Population Change');",
   "    $('td:eq(1)', row).attr('title', 'The proportion of datazones experiencing population increase');",
   # Row 8
   "  }else if(index === 9){",
