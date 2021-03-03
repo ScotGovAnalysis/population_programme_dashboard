@@ -140,7 +140,105 @@ create_symbols_council2 <- function(data, council){
     ungroup() %>%
     select(variable, icon2)
 }
+##################################################################
+##                   Create HLE/LE indicator symbols            ##
+##################################################################
 
+# Symbols for Scotland ---------------------------------------------------
+
+create_LE_symbols_scotland <- function(data){
+  data %>%
+    na.omit() %>% 
+    filter(area == "Scotland") %>%
+    filter(period %in% c(max(period), (max(period)-1))) %>%
+    group_by(indicator, variable, area) %>%
+    mutate(upper_limit = significant_change_calulator(estimate = value,
+                                                      confidence_interval = ci,
+                                                      limit = "upper"),
+           lower_limit = significant_change_calulator(estimate = value,
+                                                      confidence_interval = ci,
+                                                      limit = "lower"),
+           icon = ifelse(
+             # 0 not in positive interval & increased
+             lower_limit >= 0 & upper_limit >= 0 & value > lag(value), 1,
+             # 0 not in positive interval & decreased
+             ifelse(lower_limit >= 0 & upper_limit >= 0 & value < lag(value), -1,
+                    # 0 not in negative interval & increased
+                    ifelse(lower_limit < 0 & upper_limit < 0 & value > lag(value), 1,
+                           # 0 not in negative interval & decreased - everything else maintaining
+                           ifelse(lower_limit < 0 & upper_limit < 0 & value < lag(value), -1, 0))))) %>%
+    na.omit() %>%
+    ungroup() %>% 
+    mutate(icon = case_when(
+      icon == 1 ~ as.character(icon("arrow-up",lib = "glyphicon")),
+      icon == 0 ~ as.character(icon("minus",lib = "glyphicon")),
+      icon == -1 ~ as.character(icon("arrow-down",lib = "glyphicon")))) %>% 
+    select(variable, icon)
+}
+
+# Symbols for Scotland ---------------------------------------------------
+
+create_LE_symbols_council1 <- function(data, council){
+  data %>%
+    na.omit() %>% 
+    filter(area == council) %>%
+    filter(period %in% c(max(period), (max(period)-1))) %>%
+    group_by(indicator, variable, area) %>%
+    mutate(upper_limit = significant_change_calulator(estimate = value,
+                                                      confidence_interval = ci,
+                                                      limit = "upper"),
+           lower_limit = significant_change_calulator(estimate = value,
+                                                      confidence_interval = ci,
+                                                      limit = "lower"),
+           icon1 = ifelse(
+             # 0 not in positive interval & increased
+             lower_limit >= 0 & upper_limit >= 0 & value > lag(value), 1,
+             # 0 not in positive interval & decreased
+             ifelse(lower_limit >= 0 & upper_limit >= 0 & value < lag(value), -1,
+                    # 0 not in negative interval & increased
+                    ifelse(lower_limit < 0 & upper_limit < 0 & value > lag(value), 1,
+                           # 0 not in negative interval & decreased - everything else maintaining
+                           ifelse(lower_limit < 0 & upper_limit < 0 & value < lag(value), -1, 0))))) %>%
+    na.omit() %>%
+    ungroup() %>% 
+    mutate(icon1 = case_when(
+      icon1 == 1 ~ as.character(icon("arrow-up",lib = "glyphicon")),
+      icon1 == 0 ~ as.character(icon("minus",lib = "glyphicon")),
+      icon1 == -1 ~ as.character(icon("arrow-down",lib = "glyphicon")))) %>% 
+    select(variable, icon1)
+}
+
+# Symbols for Scotland ---------------------------------------------------
+
+create_LE_symbols_council2 <- function(data, council){
+  data %>%
+    na.omit() %>% 
+    filter(area == council) %>%
+    filter(period %in% c(max(period), (max(period)-1))) %>%
+    group_by(indicator, variable, area) %>%
+    mutate(upper_limit = significant_change_calulator(estimate = value,
+                                                      confidence_interval = ci,
+                                                      limit = "upper"),
+           lower_limit = significant_change_calulator(estimate = value,
+                                                      confidence_interval = ci,
+                                                      limit = "lower"),
+           icon2 = ifelse(
+             # 0 not in positive interval & increased
+             lower_limit >= 0 & upper_limit >= 0 & value > lag(value), 1,
+             # 0 not in positive interval & decreased
+             ifelse(lower_limit >= 0 & upper_limit >= 0 & value < lag(value), -1,
+                    # 0 not in negative interval & increased
+                    ifelse(lower_limit < 0 & upper_limit < 0 & value > lag(value), 1,
+                           # 0 not in negative interval & decreased - everything else maintaining
+                           ifelse(lower_limit < 0 & upper_limit < 0 & value < lag(value), -1, 0))))) %>%
+    na.omit() %>%
+    ungroup() %>% 
+    mutate(icon2 = case_when(
+      icon2 == 1 ~ as.character(icon("arrow-up",lib = "glyphicon")),
+      icon2 == 0 ~ as.character(icon("minus",lib = "glyphicon")),
+      icon2 == -1 ~ as.character(icon("arrow-down",lib = "glyphicon")))) %>% 
+    select(variable, icon2)
+}
 ##################################################################
 ##       Create data with sparklines and join the symbols       ##
 ##################################################################
