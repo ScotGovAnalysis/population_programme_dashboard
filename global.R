@@ -203,11 +203,11 @@ life_expectancy <- le %>%
   # -13 to include 2019 in mid year from three year range
   filter(period >= (current_year-13)) %>%
   mutate(value = round(value, digits = 2),
-         age = "",
-         "variable" = paste0(age, sex),
+         "variable" = sex,
          # Add one to get middle year of 3 year range
-         period = period+1) %>% 
-  select(-c(age, sex, lower_ci, upper_ci))
+         period = period+1,
+         ci = value - lower_ci) %>%
+  select(-c(sex, lower_ci, upper_ci))
 
 ## ---------------------------------------------------------------
 ##                   Healthy life expectancy                    --
@@ -220,78 +220,19 @@ life_expectancy <- le %>%
 #          period = as.numeric(gsub("-.*", "", period)))
 
 
-healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>% 
+healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
   select("area" = Area_name,
          "period" = Period,
-         "age" = `Age group`,
          "value" = `Healthy Life Expectancy (HLE) _`,
-         "sex" = Sex#,
-         # "lower_ci" = `HLE Lower CI_`,
-         # "upper_ci" = `HLE Upper CI_`
-         ) %>%
+         "sex" = Sex,
+         "lower_ci" = `HLE Lower CI_`,
+         "upper_ci" = `HLE Upper CI_`) %>%
   mutate("indicator" = "Healthy Life Expectancy",
          value = round(value, digits = 2),
-         sex = gsub('s', ' ', sex),
-         age = "",
+         "variable" = gsub('s', ' ', sex),
          period = (as.numeric(gsub("-.*", "", period))+1),
-         "variable" = paste0(age, sex)) %>% 
-  select(-c(age, sex)) %>% 
-  # Add in council areas for missing years
-  group_by(period, variable, indicator) %>%  
-  tidyr::complete(area = council_areas$area)
-
-
-
-#TODO do this instead of the ordinary icon function
-# 
-# CI_healthy_life_expectancy <- datatable(readxl::read_xlsx(file_path_hle) %>%
-#   select("area" = Area_name,
-#          "period" = Period,
-#          "age" = `Age group`,
-#          "value" = `Healthy Life Expectancy (HLE) _`,
-#          "sex" = Sex,
-#          "lower_ci" = `HLE Lower CI_`,
-#          "upper_ci" = `HLE Upper CI_`
-#   ) %>%
-#   mutate("indicator" = "Healthy Life Expectancy",
-#          value = round(value, digits = 2),
-#          # sex = gsub('s', '', sex),
-#          age = "",
-#          period = (as.numeric(gsub("-.*", "", period))+1),
-#          "variable" = paste0(age, sex)) %>%
-#   select(-c(age, sex)) %>%
-#   filter(period %in% c(max(period), (max(period)-1))) %>%
-#   group_by(variable, area) %>%
-#   mutate(ci = value - lower_ci,
-#          upper_limit = significant_change_calulator(estimate = value,
-#                                                     confidence_interval = ci,
-#                                                     limit = "upper"),
-#          lower_limit = significant_change_calulator(estimate = value,
-#                                                     confidence_interval = ci,
-#                                                     limit = "lower"),
-#          significant_change = ifelse(
-#               # 0 not in positive interval & increased
-#               lower_limit >= 0 & upper_limit >= 0 & value - lag(value) > 0, 1,
-#               # 0 not in positive interval & decreased
-#               ifelse(lower_limit >= 0 & upper_limit >= 0 & value - lag(value) < 0, -1,
-#               # 0 not in negative interval & increased
-#               ifelse(lower_limit < 0 & upper_limit < 0 & value - lag(value) > 0, 1,
-#               # 0 not in negative interval & decreased - everything else maintaining
-#               ifelse(lower_limit < 0 & upper_limit < 0 & value - lag(value) < 0, -1, 0))))) %>%
-#   na.omit() %>%
-#   group_by(area, period) %>%
-#   summarise(icon = sum(significant_change)) %>%
-#   mutate(icon = case_when(
-#     icon == 2 ~ as.character(icon("arrow-up",lib = "glyphicon")),
-#     icon == 1 ~ as.character(icon("arrow-up",lib = "glyphicon")),
-#     icon == 0 ~ as.character(icon("minus",lib = "glyphicon")),
-#     icon == -1 ~ as.character(icon("arrow-down",lib = "glyphicon")),
-#     icon == -2 ~ as.character(icon("arrow-down",lib = "glyphicon"))),
-#     variable = "Overall",
-#     indicator = paste("Healthy Life Expectancy", as.character(icon("info-sign", lib = "glyphicon"))),
-#     icon1 = icon,
-#     icon2 = icon) %>%
-#   select(-period), escape = F)
+         ci = value - lower_ci) %>%
+  select(-c(sex, lower_ci, upper_ci)) 
 
 ## ---------------------------------------------------------------
 ##               Population Change - Data Zones               --
