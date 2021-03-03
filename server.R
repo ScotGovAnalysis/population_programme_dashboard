@@ -117,12 +117,12 @@ server <- function(input, output, session) {
     council1 <- input$council_1
     council2 <- input$council_2
 
-    scotland_symbol <- create_symbols_scotland(life_expectancies)
+    scotland_symbol <- create_LE_symbols_scotland(life_expectancies)
 
-    council1_symbol <- create_symbols_council1(life_expectancies,
+    council1_symbol <- create_LE_symbols_council1(life_expectancies,
                                                council1)
 
-    council2_symbol <- create_symbols_council2(life_expectancies,
+    council2_symbol <- create_LE_symbols_council2(life_expectancies,
                                                council2)
 
     combine_columns_and_symbols(life_expectancies,
@@ -268,12 +268,13 @@ server <- function(input, output, session) {
   
   
   output$key <- renderText({
-paste("<b>How to read this chart</b>", br(),
-  as.character(icon("arrow-up", lib = "glyphicon")), "Increasing,",
-       as.character(icon("arrow-down", lib = "glyphicon")), "Decreasing,",
-       as.character(icon("minus", lib = "glyphicon")), "Maintaining", br(),
-      "The symbols represent the latest year vs the previous year", br(),
-       "<b>*Data range is", current_year-12, "-", current_year-2, "\b"
+paste0("<h2>How to read this chart</h2>",
+      "<p>These charts give an overall picture. More detailed versions will be added in time.</p>",
+      "<p>Most charts go from ", current_year-12, " - ", current_year-2, ". All the charts use the same horizontal scale</p>",
+      as.character(icon("arrow-up", lib = "glyphicon")), " Increase from last year", br(),
+      as.character(icon("arrow-down", lib = "glyphicon")), " Decrease from last year", br(),
+      as.character(icon("minus", lib = "glyphicon")), " No change from last year</p>",
+      "The arrows for <b> life expectancy</b> and <b> healthy life expectancy</b> are based on significant change."
        )
     
   })
@@ -281,14 +282,20 @@ paste("<b>How to read this chart</b>", br(),
 ##                            Plots                            ##
 #################################################################
   
-  output$pop_structure_plot <- plotly::renderPlotly(
-    
-    plotly::ggplotly(migration_datasets %>% 
-                       filter(area == "Scotland") %>% 
-               ggplot(aes(x = as.factor(period), y = value, group = 3, colour = variable)) +
-               geom_line()
-  )
-  )
+  output$pop_structure_plot <- plotly::renderPlotly(plotly::ggplotly(
+    migration_datasets %>%
+      filter(
+        area %in% c("Scotland", "City of Edinburgh", "Glasgow City"),
+        variable == "Overseas <i class=\"glyphicon glyphicon-info-sign\"></i>"
+      ) %>%
+      ggplot(aes(
+        x = as.factor(period),
+        y = value,
+        group = 3,
+        colour = area
+      )) +
+      geom_line()
+  ))
   
   
   
@@ -454,9 +461,5 @@ paste("<b>How to read this chart</b>", br(),
         <p>This statement was prepared on <b>15 March 2021</b>.</p>
         
         <p>These web pages were reviewed <b>February 2021</b>.</p>"))
-          
-  
-  
-  
+        
 }
-
