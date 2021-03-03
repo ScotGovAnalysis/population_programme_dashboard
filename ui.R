@@ -21,21 +21,25 @@ ui <- navbarPage(position = "fixed-top",
                uiOutput("subheader")
              )),
     hr(),
-    fluidRow(column(1),
-             column(6, uiOutput("key")), 
-             column(2,
-               selectInput(
-                 "council_1",
-                 label = "Select council area 1:",
-                 choices = council_areas$area,
-                 selected = "Aberdeen City")), 
-             column(2,
-               selectInput(
-                 "council_2",
-                 label = "Select council area 2:",
-                 choices = council_areas$area,
-                 selected = "Aberdeenshire")),
-             column(1)),
+    fluidRow(
+      column(1),
+      column(6, uiOutput("key")),
+      column(4,
+             fluidRow(column(6,
+                    style = "margin-top: 100px;",
+        selectInput(
+          "council_1",
+          label = "Select council area 1:",
+          choices = council_areas$area,
+          selected = "Aberdeen City")),
+        column(6,
+             style = "margin-top: 100px;",
+        selectInput(
+          "council_2",
+          label = "Select council area 2:",
+          choices = council_areas$area,
+          selected = "Aberdeenshire")))),
+      column(1)), 
     
     htmlwidgets::getDependency('sparkline'),
     fluidRow(
