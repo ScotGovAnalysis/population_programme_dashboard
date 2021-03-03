@@ -42,7 +42,7 @@ where { ?data qb:dataSet
 # Life expectancy confidence intervals -------------------------------------------------
 
 le_query_ci <- "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?area ?period ?age ?sex ?lower_ci ?upper_ci
+SELECT ?area ?period ?sex ?lower_ci ?upper_ci
 WHERE {
   ?obs <http://purl.org/linked-data/cube#dataSet>
   <http://statistics.gov.scot/data/Life-Expectancy> .
@@ -70,7 +70,7 @@ WHERE {
 # Life expectancy -------------------------------------------------
 
 le_query <- "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?area ?period ?age ?sex ?value
+SELECT ?area ?period ?sex ?value
 WHERE {
   ?obs <http://purl.org/linked-data/cube#dataSet>
   <http://statistics.gov.scot/data/Life-Expectancy> .
@@ -102,7 +102,7 @@ WHERE {
 # Using SPARQL to join the area names
 
 hle_query <- "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT ?area ?period ?age ?value ?sex
+SELECT ?area ?period ?value ?sex
 WHERE {
   ?obs <http://purl.org/linked-data/cube#dataSet>
   <http://statistics.gov.scot/data/healthy-life-expectancy> .
