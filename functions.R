@@ -36,6 +36,8 @@ sparkline_format <- function(type, y, x) {
     spk_chr(
       values = y,
       xvalues = x,
+      height = "50px",
+      width = "100px",
       type = "line",
       numberDigitGroupSep = "",
       # Remove Comma from tooltip
@@ -54,12 +56,15 @@ sparkline_format <- function(type, y, x) {
     
     spk_chr(
       values = y,
+      height = "50px",
+      width = 100,
       type = "bar",
       numberDigitGroupSep = "",
       # Remove comma from tooltip
       barColor = "#0065bd",
       negBarColor = "red",
-      barWidth = 5,
+      barWidth = 10,
+      barSpacing = 2,
       tooltipFormat = '* {{value}}'
     )
   }
