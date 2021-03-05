@@ -453,7 +453,8 @@ paste0("<h2>How to read this chart</h2>",
         <ul>
         <li>The small charts in the Home page table are not accessible for screen readers.</li>
         <li>Some text and shading does not appear in high contrast mode - mostly tooltips within the table.</li>
-        <li>.</li>
+        <li>The icons do not currently have alternative text.</li>
+        <li>The tooltips are not accessible for screen readers (these are detailed in the about page).</li>
         </ul>
         
         <h3>Preparation of statement</h3>
