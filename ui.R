@@ -15,15 +15,21 @@ ui <- navbarPage(position = "fixed-top",
     
     #mainPanel(
     fluidRow(column(1),
-             column(
-               11,
+             column(8,
                h1("Population Programme"),
-               uiOutput("subheader")
-             )),
+               uiOutput("subheader")),
+             column(2, #align = "right",
+                    style = "margin-top: 25px;",
+                    tags$a(img(src = "scotgovlogo.svg",
+                               height = 60,
+                               alt = "Scottish Government Logo"), 
+                           href = "https://www.gov.scot/")),
+             column(1)),
     hr(),
     fluidRow(
       column(1),
-      column(6, uiOutput("key")),
+      column(6, 
+             uiOutput("key")),
       column(4,
              fluidRow(column(6,
                     style = "margin-top: 100px;",
@@ -81,8 +87,3 @@ ui <- navbarPage(position = "fixed-top",
          uiOutput("accessibility")),
    column(2)
 ))
-
-
-# tabPanel(tags$a(img(src = "scotgovlogo.svg",
-#                        height = 30),
-#          href = "https://www.gov.scot/", target="_blank"))
