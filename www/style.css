@@ -1,9 +1,10 @@
 
 body {
-    font-size: 20px;
+    font-size: large;
     color: #333e38;
     background-color: #ffffff;
     padding-top: 70px;
+    line-height: 1.8;
 }
 
 a {
