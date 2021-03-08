@@ -65,7 +65,7 @@ sparkline_format <- function(type, y, x) {
       negBarColor = "red",
       barWidth = 10,
       barSpacing = 2,
-      tooltipFormat = '* {{value}}'
+      tooltipFormat = '{{value}}'
     )
   }
 }
