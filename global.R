@@ -158,6 +158,7 @@ inactive <- ods_dataset(
   "economic-inactivity",
   measureType = "count",
   gender = "all",
+  age = "16-years-and-over",
   refPeriod = year_quarters
 )
 
@@ -165,20 +166,21 @@ active <- ods_dataset(
   "economic-activity",
   measureType = "count",
   gender = "all",
+  age = "16-years-and-over",
   refPeriod = year_quarters
 )
 
-active_dependency_ratio <- inactive %>% 
+test_active_dependency_ratio <- inactive %>% 
   group_by(refArea, refPeriod) %>%
-  summarise(inactivity = sum(as.numeric(value))) %>%
+  summarise(inactivity = as.numeric(value)) %>%
 # Join economic ACTIVITY
   inner_join(active %>%
     group_by(refArea, refPeriod) %>%
-    summarise(activity = sum(as.numeric(value)))) %>%
+    summarise(activity = as.numeric(value))) %>%
   # Remove the "-QX" to make it numeric 
   mutate(period = as.numeric(gsub("-.*", "", refPeriod)),
          # calculate ADR with inactivity/activity multiplied by 1000
-         value = round((inactivity / activity) * 1000, digits = 2),
+         value = round((inactivity * 1000) / activity, digits = 2),
          "indicator" = "Active Dependency Ratio") %>% 
   left_join(area_name_lookup, by = c("refArea" = "area_code")) %>% 
   ungroup() %>% 
