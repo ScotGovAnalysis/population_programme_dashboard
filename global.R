@@ -9,9 +9,8 @@ library(DT)
 library(opendatascot)
 
 #################################################################
-##                          Variables                          ##
+##                          File Paths                         ##
 #################################################################
-last_update <- HTML("Last updated: <b>25th February 2021<b/>")
 # File paths for static data files
 file_path_hle <- "data/HLE.xlsx"
 # Net Migration within Scotland
@@ -22,6 +21,11 @@ file_path_net_overseas <- "data/mig-overseas-admin-sex-tab1.xlsx"
 file_path_ruk <- "data/mig-uk-admin-sex-91-latest-tab2.xlsx"
 # Components of change
 file_path_natural_change <- "data/Natural change - 2009-2019.xlsx"
+
+#################################################################
+##                          Variables                          ##
+#################################################################
+
 # Area name lookups
 area_name_lookup <- read.csv("data/area_codes.csv")
 council_areas <- area_name_lookup %>% filter(area != "Scotland")
@@ -100,7 +104,6 @@ source("functions.R")
 
 # Call data with API
 pop_structure <- opendatascot:::ods_query_database(endpoint, pop_structure_query) 
-
 
 # Population structure by age ---------------------------------------------
 
