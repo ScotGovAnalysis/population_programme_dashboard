@@ -309,9 +309,8 @@ paste0("<h2>How to read this chart</h2>",
       <p>The <a href = 'https://nationalperformance.gov.scot/'>National Performance Framework</a> 
       (NPF) includes an indicator on Scotland’s population under the National Outcome “we are open, 
       connected and make a positive contribution internationally”. This dashboard includes the NPF 
-      indicator as well as a number of other indicators to monitor progress and understand the 
-      challenges facing the population programme. These are structured around population structure 
-      and distribution, priority areas agreed by the Population Taskforce.</p>
+      indicator as well as a number of other indicators which report on Scotland's changing population
+      to capture the multi-dimensional nature of population challenges.</p>
       
       <p>As agreed by the Population Taskforce, the Scottish Government’s aim is to make communities 
       across Scotland attractive places to live, work, bring up families and to move to; so that 
@@ -323,87 +322,87 @@ paste0("<h2>How to read this chart</h2>",
         
       <ul><li>Email: <a href = 'mailto:population@gov.scot'>population@gov.scot</a></li>
       <li>Phone: 0300 244 4000 (Scottish Government central enquiry unit)</li>
-      <li>Scottish Government <a href = 'https://www.gov.scot/about/contact-information/'>general enquiries</a></ul></li>  
+      <li>Scottish Government <a href = 
+          'https://www.gov.scot/about/contact-information/'>general enquiries</a></ul></li>  
         
-      <h2>Definitions</h2>
+      <h2>Data</h2>
       <h3>Population structure</h3>  
-      <p>Proportion of children, people aged 16 - 64, and people 65 and over.</p>
+      <p>Proportion of the total population who are children (ages 0 to 15), working age (aged 16 to 64), 
+      and pensionable age (aged 65 and over).</p>
+      <p>Source: <a href = 
+          'https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/population/population-estimates/mid-year-population-estimates'>
+      Mid-year Population Estimates, 
+      National Records of Scotland</a></p>
+      <p>Linked data: <a href = 
+          'https://statistics.gov.scot/resource?uri=http%3A%2F%2Fstatistics.gov.scot%2Fdata%2Fpopulation-estimates-2011-datazone-linked-dataset'>
+      SG open data platform</a></p>
       
       <h3>Active dependency ratio</h3>  
-      <p>Number of economically inactive people aged 16 and over that are economically inactive per 1,000 economically active:</p>  
-        
-      <ul><li>Performance improving if ratio has increased.</li>  
-      <li>Performance maintaining if ratio has not changed.</li>  
-      <li>Performance worsening if ratio has decreased.</ul></li>  
-      
+      <p>Number of people aged 16 and over that are economically inactive per 1,000 economically active</p>  
+      <p>Sources: 
+      <ul><li><a href = 
+          'https://statistics.gov.scot/resource?uri=http%3A%2F%2Fstatistics.gov.scot%2Fdata%2Feconomic-activity'>
+      Economic Activity, Annual Population Survey, Scottish Government</a></li>
+      <li><a href = 
+          'https://statistics.gov.scot/resource?uri=http%3A%2F%2Fstatistics.gov.scot%2Fdata%2Feconomic-inactivity'>
+      Economic Inactivity, Annual Population Survey, Scottish Government</a></p></ul></li>
+
       <h3>Life expectancy</h3>  
-      <p>Average number of years a new born baby could be expected to live:</p>
-        
-      <ul><li>Performance improving if both male and female LE has significantly increased or if LE of one sex has significantly increased and there hasn’t been a significant change in the other.</li>  
-      <li>Performance maintaining if male and female LE has significantly changed in opposite directions or if there hasn’t been a significant change for males and females.</li>  
-      <li>Performance worsening if both male and female LE has significantly decreased or if LE of one sex has significantly decreased and there hasn’t been a significant change in the other.</ul></li>  
-      
+      <p>Average number of years a newborn baby could be expected to live. Data are based on calendar years and 
+      are published as 3 year rolling averages. Dashboard arrow direction based on significant change.</p>
+      <p>Source: <a href = 
+          'https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/life-expectancy/life-expectancy-at-scotland-level'>
+      Life Expectancy in Scotland, National Records of Scotland</a></p>
+      <p>Linked data: <a href = 
+          'https://statistics.gov.scot/resource?uri=http%3A%2F%2Fstatistics.gov.scot%2Fdata%2FLife-Expectancy'>
+      SG open data platform</a></p>
+
       <h3>Healthy life expectancy</h3> 
-      <p>Average number of years a new born baby could be expected to live in ‘good’ or ‘very good’ health:</p>
-        
-      <ul><li>Performance improving if both male and female HLE has significantly increased or if HLE of one sex has significantly increased and there hasn’t been a significant change in the other.</li>
-      <li>Performance maintaining if male and female HLE has significantly changed in opposite directions or if there hasn’t been a significant change for males and females.</li>
-      <li>Performance worsening if both male and female HLE has significantly decreased or if HLE of one sex has significantly decreased and there hasn’t been a significant change in the other.</ul></li> 
+      <p>Average number of years a new born baby could be expected to live in ‘good’ or ‘very good’ health. Data are based on 
+      calendar years and are published as 3 year rolling averages. Dashboard arrow direction based on significant change.</p>
+      <p>The National Performance Framework includes an indicator on Healthy Life Expectancy.</p>
+      <p>Source: <a href = 
+          'https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/life-expectancy/healthy-life-expectancy-in-scotland'>
+      Healthy Life Expectancy in Scotland, National Records of Scotland</p></a>
+      <p>Linked data: <a href = 
+          'https://statistics.gov.scot/resource?uri=http%3A%2F%2Fstatistics.gov.scot%2Fdata%2Fhealthy-life-expectancy'>
+      SG open data platform</p></a>
+
+      <h3>Population change by council area</h3>  
+      <p>Number of council areas experiencing an increase or decrease in total population.</p>
+      <p>The National Performance Framework Population indicator is the number of council areas experiencing population decline. </p>
+      <p>Source: <a href = 
+          'https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/population/population-estimates/mid-year-population-estimates'>
+      Mid-year Population Estimates, National Records of Scotland</a></p>
+      <p>Linked data: <a href = 
+          'https://statistics.gov.scot/resource?uri=http%3A%2F%2Fstatistics.gov.scot%2Fdata%2Fpopulation-estimates-2011-datazone-linked-dataset'>
+      SG open data platform</a></p>
       
-      <h3>Population change</h3>  
-      <h4>Council area</h4>
-      <p>Number of councils experiencing population increase or decline:</p>
-        
-      <ul><li>Performance improving if number of councils increasing has increased.</li>  
-      <li>Performance improving if number of councils decreasing has decreased.</li>  
-      <li>Performance maintaining if number of councils has not changed.</li>  
-      <li>Performance worsening if number of councils decreasing has increased.</li>  
-      <li>Performance worsening if number of councils increasing has decreased.</ul></li>  
+      <h3>Population change by data zone</h3>
+      <p>The percentage of data zones (small areas with a population of approximately 500 to 1,000 residents) 
+      within a council area which have experienced an increase or decrease in population.</p>  
+      <p>Source: <a href = 
+          'https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/population/population-estimates/2011-based-special-area-population-estimates/small-area-population-estimates'>
+      Small Area Population Estimates, National Records of Scotland</a></p>
+      <p>Linked data: <a href = 
+          'https://statistics.gov.scot/resource?uri=http%3A%2F%2Fstatistics.gov.scot%2Fdata%2Fpopulation-estimates-2011-datazone-linked-dataset'>
+      SG open data platform</a></p>
       
-      <h4>Data zone</h4>
-      <p>Percentage of datazones (small areas) experiencing population increase or decline:</p>  
-        
-      <ul><li>Performance improving if percentage of datazones increasing has increased.</li>  
-      <li>Performance improving if percentage of datazones decreasing has decreased.</li>  
-      <li>Performance maintaining if percentage of datazones has not changed.</li>  
-      <li>Performance worsening if percentage of datazones decreasing has increased.</li>  
-      <li>Performance worsening if percentage of datazones increasing has decreased.</li></ul>
-      
-      <h4>Natural Change</h4>
-      <p>The number of births minus the number of deaths:</p>
-        
-      <ul><li>Performance improving if natural change has increased.</li>  
-      <li>Performance maintaining if natural change has not changed.</li>  
-      <li>Performance worsening if natural change has decreased.</ul></li>  
-      
+      <h3>Natural Change</h3>
+      <p>The number of births minus the number of deaths.</p> 
+      <p>Source: <a href = 
+          'https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/population/population-estimates/mid-year-population-estimates'>
+      Mid-year Population Estimates, National Records of Scotland</a></p>
+
       <h3>Net Migration</h3>
-      <h4>Within Scotland</h4>
-      <p>Net migration from other areas within Scotland:</p>  
-        
-      <ul><li>Performance improving if within Scotland migration has increased.</li>  
-      <li>Performance maintaining if within Scotland migration has not changed.</li>  
-      <li>Performance worsening if within Scotland migration has decreased.</ul></li>  
-      
-      <h4>Rest of the UK</h4> 
-      <p>Net migration from the rest of the UK:</p>
-        
-      <ul><li>Performance improving if rest of the UK migration has increased.</li>  
-      <li>Performance maintaining if rest of the UK migration has not changed.</li>  
-      <li>Performance worsening if rest of the UK migration has decreased.</ul></li>  
-      
-      <h4>Overseas</h4>  
-      <p>Net migration from outside the UK:</p>
-        
-      <ul><li>Performance improving if overseas migration has increased.</li>  
-      <li>Performance maintaining if overseas migration has not changed.</li>  
-      <li>Performance worsening if overseas migration has decreased.</ul></li>  
-      
-      <h4>Total</h4>  
-      <p>Net migration from other areas within Scotland and areas outwith Scotland:</p>  
-        
-      <ul><li>Performance improving if total migration has increased.</li>  
-      <li>Performance maintaining if total migration has not changed.</li>  
-      <li>Performance worsening if total migration has decreased.</ul></li>"
+      <p>Net migration is inward migration minus outward migration.</p>
+      <p>Within Scotland migration refers to migration from other areas in Scotland.</p>
+      <p>Migration from the rest of the UK refers to migration from England, Northern Ireland and Wales.</p>
+      <p>Migration from overseas refers to migration from areas outside of the UK.</p>
+      <p>Total net migration refers to migration from within in Scotland, the rest of the UK and overseas.</p>
+      <p>Source: <a href = 
+          'https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/migration/migration-statistics/migration-flows'>
+      Migration Flows, National Records of Scotland</p>"
     )
   )
   
