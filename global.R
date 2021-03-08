@@ -170,7 +170,7 @@ active <- ods_dataset(
   refPeriod = year_quarters
 )
 
-test_active_dependency_ratio <- inactive %>% 
+active_dependency_ratio <- inactive %>% 
   group_by(refArea, refPeriod) %>%
   summarise(inactivity = as.numeric(value)) %>%
 # Join economic ACTIVITY
