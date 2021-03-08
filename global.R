@@ -348,7 +348,7 @@ pop_change_by_data_zone <- pop_estimates_datazones %>%
 net_within_scotland <- readxl::read_excel(
   file_path_net_with_scot,
   sheet = "TS - Internal Migration",
-  range = "B5:T38"
+  range = "B81:T113"
 ) %>% 
   tidyr::pivot_longer(2:19, names_to = "period", values_to = "value") %>% 
   rename("area" = `...1`) %>% 
@@ -356,10 +356,17 @@ mutate(area = gsub("Total Moves within Scotland3", "Scotland", area),
        "variable" = "Within Scotland",
        "indicator" = "Net Migration",
        period = as.numeric(gsub("-.*","",period))+1,
-       value = ifelse(area == "Scotland", 0, value),
        variable = paste(variable, as.character(icon("info-sign", lib = "glyphicon"))),
-       indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
-  filter(period >= 2009)
+       indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>%  
+  # It needs Scotland for the table render
+  rbind(tibble(area = "Scotland",
+               period = 2009,
+               value = 0,
+               variable = paste("Within Scotland", as.character(icon("info-sign", lib = "glyphicon"))),
+               indicator = paste("Net Migration", as.character(icon("info-sign", lib = "glyphicon"))))) %>% 
+  filter(period >= current_year-12)  %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
 
 ## ----------------------------------------------------------------
 ##                      Net rest of the UK                      --
