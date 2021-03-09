@@ -3,6 +3,7 @@
 #################################################################
 
 library(shiny)
+library(shinyalert)
 library(dplyr)
 library(sparkline)
 library(DT)
@@ -141,7 +142,7 @@ pop_change_by_council_area <- pop_structure %>%
                  area != "Scotland") %>%
           group_by(area) %>% 
           arrange(period) %>% 
-          mutate(change = ifelse(value-lag(value) < 0, 0, 1),
+          mutate(change = ifelse(value-lag(value) > 0, 1, 0),
                  "variable" = "Increased council areas") %>% 
           filter(period >= current_year-12) %>% 
           group_by(period, `variable`) %>% 
@@ -206,11 +207,12 @@ life_expectancy <- le %>%
   mutate("indicator" = "Life Expectancy",
          period = as.numeric(gsub("-.*", "", period))) %>% 
   # -13 to include 2019 in mid year from three year range
-  filter(period >= (current_year-13)) %>%
+  filter(period >= (current_year-12)) %>%
   mutate(value = round(value, digits = 2),
          "variable" = sex,
          # Add one to get middle year of 3 year range
-         period = period+1,
+         period = period#+1
+         ,
          ci = value - lower_ci) %>%
   select(-c(sex, lower_ci, upper_ci))
 
@@ -235,7 +237,8 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
   mutate("indicator" = "Healthy Life Expectancy",
          value = round(value, digits = 2),
          "variable" = gsub('s', ' ', sex),
-         period = (as.numeric(gsub("-.*", "", period))+1),
+         period = (as.numeric(gsub("-.*", "", period))#+1
+                   ),
          ci = value - lower_ci) %>%
   select(-c(sex, lower_ci, upper_ci)) 
 
@@ -311,7 +314,7 @@ pop_change_by_data_zone <- pop_estimates_datazones %>%
       mutate(
         value = as.numeric(value),
         period = as.numeric(period),
-        change = ifelse(value - lag(value) < 0, 0, 1),
+        change = ifelse(value - lag(value) > 0, 1, 0),
         "variable" = "% Increased data zones"
       ) %>%
       filter(period != 2008) %>%
@@ -327,7 +330,7 @@ pop_change_by_data_zone <- pop_estimates_datazones %>%
           arrange(period) %>%
           mutate(
             value = as.numeric(value),
-            change = ifelse(value - lag(value) < 0, 0, 1),
+            change = ifelse(value - lag(value) > 0, 1, 0),
             "variable" = "% Increased data zones"
           ) %>%
           filter(period != 2008) %>%
