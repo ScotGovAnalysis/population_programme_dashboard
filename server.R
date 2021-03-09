@@ -3,7 +3,22 @@
 ##################################################################
 
 server <- function(input, output, session) {
-  
+  shinyalert(
+    title = "Work in progress",
+    text = "If the small charts stop working correctly, 
+    refreshing the page usually fixes it.",
+    size = "xs", 
+    closeOnEsc = TRUE,
+    closeOnClickOutside = FALSE,
+    html = FALSE,
+    type = "warning",
+    showConfirmButton = TRUE,
+    showCancelButton = FALSE,
+    confirmButtonText = "OK",
+    confirmButtonCol = "#AEDEF4",
+    timer = 0,
+    imageUrl = ""
+  )
   # 
   # output$about <- about_page 
   # #output$accessibility <- accessibility_page 

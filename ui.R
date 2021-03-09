@@ -5,8 +5,10 @@ ui <- navbarPage(position = "fixed-top",
   
 
   windowTitle = "Population Dashboard",
+  
   tabPanel(
     "Home",
+    useShinyalert(),
     tags$html(lang = "en"),
     icon = icon("home"), 
     HTML("<script src='https://cc.cdn.civiccomputing.com/8/cookieControl-8.x.min.js'></script>"),
