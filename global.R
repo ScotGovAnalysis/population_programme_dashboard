@@ -3,7 +3,6 @@
 #################################################################
 
 library(shiny)
-library(shinyalert)
 library(dplyr)
 library(sparkline)
 library(DT)
