@@ -2,6 +2,8 @@
 ##                            Server                            ##
 ##################################################################
 
+server <- function(input, output, session) {
+  
   url <- a(HTML("Population Taskforce"), 
            href = "https://www.gov.scot/groups/population-task-force/")
   
