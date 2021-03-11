@@ -360,7 +360,7 @@ mutate(area = gsub("Total Moves within Scotland3", "Scotland", area),
        indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>%  
   # It needs Scotland for the table render
   rbind(tibble(area = "Scotland",
-               period = 2009,
+               period = current_year-12,
                value = 0,
                variable = paste("Within Scotland", as.character(icon("info-sign", lib = "glyphicon"))),
                indicator = paste("Net Migration", as.character(icon("info-sign", lib = "glyphicon"))))) %>% 
@@ -383,7 +383,7 @@ net_ruk <- readxl::read_xlsx(file_path_ruk,
          "indicator" = "Net Migration",
          area = gsub('SCOTLAND', 'Scotland', area),
          period = as.numeric(gsub("-.*","",period))+1) %>% 
-  filter(period >= 2009)
+  filter(period >= current_year-12)
 
 ## ----------------------------------------------------------------
 ##                         Net Overseas                         --
@@ -402,7 +402,7 @@ net_overseas <- readxl::read_excel(file_path_net_overseas,
          # +1 is to pick the later of the year range
          period = as.numeric(gsub("-.*","",period))+1,
          ) %>% 
-  filter(period >= 2009)
+  filter(period >= current_year-12)
 
 ## ----------------------------------------------------------------
 ##                     Total Net Migration                      --
