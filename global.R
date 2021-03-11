@@ -206,12 +206,11 @@ life_expectancy <- le %>%
   mutate("indicator" = "Life Expectancy",
          period = as.numeric(gsub("-.*", "", period))) %>% 
   # -13 to include 2019 in mid year from three year range
-  filter(period >= (current_year-12)) %>%
+  filter(period >= (current_year-13)) %>%
   mutate(value = round(value, digits = 2),
          "variable" = sex,
          # Add one to get middle year of 3 year range
-         period = period#+1
-         ,
+         period = period + 1,
          ci = value - lower_ci) %>%
   select(-c(sex, lower_ci, upper_ci))
 
@@ -236,8 +235,7 @@ healthy_life_expectancy <- readxl::read_xlsx(file_path_hle) %>%
   mutate("indicator" = "Healthy Life Expectancy",
          value = round(value, digits = 2),
          "variable" = gsub('s', ' ', sex),
-         period = (as.numeric(gsub("-.*", "", period))#+1
-                   ),
+         period = (as.numeric(gsub("-.*", "", period)) + 1),
          ci = value - lower_ci) %>%
   select(-c(sex, lower_ci, upper_ci)) 
 
