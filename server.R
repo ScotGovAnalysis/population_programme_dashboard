@@ -330,6 +330,9 @@ paste0("<h2>How to read this chart</h2>",
   output$about <- renderUI(
     HTML(
       "<h1>About</h1>
+      
+      <p>Last updated: <b>15 March 2021</b></p>
+      
       <p>A <a href = 'https://www.gov.scot/groups/population-task-force/'>Population Taskforce</a> 
       and Population Programme were established in June 2019 by the Scottish Government to consider 
       Scotland’s future population challenges.</p>
