@@ -435,8 +435,13 @@ natural_change <- readxl::read_excel(file_path_natural_change) %>%
 ##                         Combine Datasets                     ##
 ##################################################################
   
-pop_change <- rbind(pop_change_by_council_area,
-  pop_change_by_data_zone) %>%
+pop_change_ca <- pop_change_by_council_area %>% 
+  mutate(variable = paste(variable, 
+                          as.character(icon("info-sign", lib = "glyphicon")))) %>% 
+  group_by(area, variable, indicator) %>% 
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
+
+pop_change_dz <- pop_change_by_data_zone %>%
   mutate(variable = paste(variable, 
                           as.character(icon("info-sign", lib = "glyphicon")))) %>% 
   group_by(area, variable, indicator) %>% 
