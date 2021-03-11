@@ -36,7 +36,7 @@ sparkline_format <- function(type, y, x, unit) {
     spk_chr(
       values = y,
       xvalues = x,
-      height = "50px",
+      height = "40px",
       width = "100px",
       type = "line",
       numberDigitGroupSep = "",
@@ -56,7 +56,7 @@ sparkline_format <- function(type, y, x, unit) {
     
     spk_chr(
       values = y,
-      height = "50px",
+      height = "40px",
       width = 100,
       type = "bar",
       numberDigitGroupSep = "",
