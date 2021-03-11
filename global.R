@@ -316,7 +316,7 @@ pop_change_by_data_zone <- pop_estimates_datazones %>%
         change = ifelse(value - lag(value) > 0, 1, 0),
         "variable" = "% Increased data zones"
       ) %>%
-      filter(period != 2008) %>%
+      filter(period != current_year-13) %>%
       
       left_join(data_zone_lookup, by = c("zone" = "DZ2011_Code")) %>%
       rename("area" = LA_Name) %>%
@@ -332,7 +332,7 @@ pop_change_by_data_zone <- pop_estimates_datazones %>%
             change = ifelse(value - lag(value) > 0, 1, 0),
             "variable" = "% Increased data zones"
           ) %>%
-          filter(period != 2008) %>%
+          filter(period != current_year-13) %>%
           group_by(period, variable) %>%
           summarise(value = sum(change)) %>%
           mutate(area = "Scotland",
