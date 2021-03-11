@@ -114,9 +114,11 @@ pop_structure_age <- pop_structure %>%
          period >= (current_year - 12)) %>% 
   mutate("variable" = paste0(age, sex)) %>% 
   select(-c(age, sex))  %>% 
-  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon")))) %>% 
+  mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon",)))) %>% 
   group_by(area, variable, indicator) %>% 
-  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1))
+  tidyr::complete(period = tidyr::full_seq((current_year-12):(current_year-1), 1)) %>% 
+  group_by(area, period) %>% 
+  mutate(value = round((value / sum(value)) * 100, digits = 2))
 
 
 # Population Change by Council area -------------------------------
