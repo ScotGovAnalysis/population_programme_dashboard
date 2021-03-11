@@ -30,7 +30,7 @@ significant_change_calulator <- function(estimate,
 
 # Format for LINE sparklines -----------------------------------------------
 
-sparkline_format <- function(type, y, x) {
+sparkline_format <- function(type, y, x, unit) {
   
   if(type == "line"){
     spk_chr(
@@ -50,7 +50,7 @@ sparkline_format <- function(type, y, x) {
       maxSpotColor = F,
       lineWidth = 2,
       spotRadius = 3,
-      tooltipFormat = '{{x}}: {{y}}')
+      tooltipFormat = paste0('{{x}}: {{y}}', unit))
     
   } else {
     
@@ -248,7 +248,7 @@ create_LE_symbols_council2 <- function(data, council){
 ##       Create data with sparklines and join the symbols       ##
 ##################################################################
 
-combine_columns_and_symbols <- function(data, x, y, a, b, c, type){
+combine_columns_and_symbols <- function(data, x, y, a, b, c, type, unit){
   # Take data and create sparkline for just Scotland
   data %>%
   filter(area == "Scotland") %>%
@@ -256,7 +256,7 @@ combine_columns_and_symbols <- function(data, x, y, a, b, c, type){
   group_by(indicator, variable) %>%
   summarise(
     # Sparkline for Scotland
-    "Scotland" = sparkline_format(type, value, period)) %>%
+    "Scotland" = sparkline_format(type, value, period, unit)) %>%
   # Create and join sparkline for just user input 1
   left_join(
     data %>%
@@ -264,7 +264,7 @@ combine_columns_and_symbols <- function(data, x, y, a, b, c, type){
       arrange(period) %>%
       group_by(indicator, variable) %>%
       # Sparkline for Council area input 1 (y)
-      summarise({{x}} := sparkline_format(type, value, period))) %>%
+      summarise({{x}} := sparkline_format(type, value, period, unit))) %>%
   # Create and join sparkline for just user input 2
   left_join(
     data %>%
@@ -272,7 +272,7 @@ combine_columns_and_symbols <- function(data, x, y, a, b, c, type){
       arrange(period) %>%
       group_by(indicator, variable) %>%
       # Sparkline for Council area input 2 (y)
-      summarise({{y}} := sparkline_format(type, value, period))) %>%
+      summarise({{y}} := sparkline_format(type, value, period, unit))) %>%
   arrange(match(variable, variable_order)) %>%
   # Join all the symbol columns
   left_join(a) %>%
@@ -284,7 +284,7 @@ combine_columns_and_symbols <- function(data, x, y, a, b, c, type){
 }
 
 # For within scotland
-combine_columns_and_symbols_within_scot <- function(data, x, y, a, b, c, type){
+combine_columns_and_symbols_within_scot <- function(data, x, y, a, b, c, type, unit){
   # Take data and create sparkline for just Scotland
   data %>%
   filter(area == "Scotland") %>%
@@ -300,7 +300,7 @@ combine_columns_and_symbols_within_scot <- function(data, x, y, a, b, c, type){
       arrange(period) %>%
       group_by(indicator, variable) %>%
       # Sparkline for Council area input 1 (y)
-      summarise({{x}} := sparkline_format(type, value, period))) %>%
+      summarise({{x}} := sparkline_format(type, value, period, unit))) %>%
   # Create and join sparkline for just user input 2
   left_join(
     data %>%
@@ -308,7 +308,7 @@ combine_columns_and_symbols_within_scot <- function(data, x, y, a, b, c, type){
       arrange(period) %>%
       group_by(indicator, variable) %>%
       # Sparkline for Council area input 2 (y)
-      summarise({{y}} := sparkline_format(type, value, period))) %>%
+      summarise({{y}} := sparkline_format(type, value, period, unit))) %>%
   arrange(match(variable, variable_order)) %>%
   # Join all the symbol columns
   left_join(a) %>%

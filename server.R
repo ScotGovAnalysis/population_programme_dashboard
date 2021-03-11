@@ -52,7 +52,8 @@ server <- function(input, output, session) {
                                 scotland_symbol, 
                                 council1_symbol, 
                                 council2_symbol,
-                                "bar")
+                                "bar",
+                                "")
   })
 
 
@@ -78,7 +79,8 @@ server <- function(input, output, session) {
                                scotland_symbol, 
                                council1_symbol, 
                                council2_symbol,
-                               "line")
+                               "line",
+                               "%")
   })
   
   
@@ -103,7 +105,8 @@ server <- function(input, output, session) {
                                scotland_symbol, 
                                council1_symbol, 
                                council2_symbol,
-                               "line")
+                               "line",
+                               "")
   })
   
 # Life expectency ----------------------------------------------------
@@ -127,7 +130,8 @@ server <- function(input, output, session) {
                                scotland_symbol,
                                council1_symbol,
                                council2_symbol,
-                               "line")
+                               "line",
+                               "")
   })
 
 # Migration ---------------------------------------------------------------
@@ -150,7 +154,8 @@ server <- function(input, output, session) {
                                 scotland_symbol, 
                                 council1_symbol, 
                                 council2_symbol,
-                                "bar")
+                                "bar",
+                                "")
     })
   
   
@@ -174,31 +179,57 @@ server <- function(input, output, session) {
                                 scotland_symbol, 
                                 council1_symbol, 
                                 council2_symbol,
-                                "bar")
+                                "bar",
+                                "")
   })
   
-  # All other datasets -------------------------------------------
+  # Pop Change by Council area -------------------------------------------
   
-  pop_change_reactive <- reactive({
+  pop_change_ca_reactive <- reactive({
     
     council1 <- input$council_1
     council2 <- input$council_2
     
-    scotland_symbol <- create_symbols_scotland(pop_change)
+    scotland_symbol <- create_symbols_scotland(pop_change_ca)
     
-    council1_symbol <- create_symbols_council1(pop_change,
+    council1_symbol <- create_symbols_council1(pop_change_ca,
                                                council1)
     
-    council2_symbol <- create_symbols_council2(pop_change,
+    council2_symbol <- create_symbols_council2(pop_change_ca,
                                                council2)
     
-    combine_columns_and_symbols(pop_change, 
+    combine_columns_and_symbols(pop_change_ca, 
                                 council1, 
                                 council2, 
                                 scotland_symbol, 
                                 council1_symbol, 
                                 council2_symbol,
-                                "line")
+                                "line",
+                                "")
+  })
+  # Pop Change by Data zone -------------------------------------------
+  
+  pop_change_dz_reactive <- reactive({
+    
+    council1 <- input$council_1
+    council2 <- input$council_2
+    
+    scotland_symbol <- create_symbols_scotland(pop_change_dz)
+    
+    council1_symbol <- create_symbols_council1(pop_change_dz,
+                                               council1)
+    
+    council2_symbol <- create_symbols_council2(pop_change_dz,
+                                               council2)
+    
+    combine_columns_and_symbols(pop_change_dz, 
+                                council1, 
+                                council2, 
+                                scotland_symbol, 
+                                council1_symbol, 
+                                council2_symbol,
+                                "line",
+                                "%")
   })
 
 ##################################################################
@@ -212,7 +243,8 @@ server <- function(input, output, session) {
     data <- pop_structure_age_reactive() %>% 
       rbind(active_dependency_ratio_reactive(),
             life_expectancies_reactive(),
-            pop_change_reactive(),
+            pop_change_dz_reactive(),
+            pop_change_ca_reactive(),
             natural_change_reactive(),
             net_within_scot_reactive(),
             migration_reactive())
