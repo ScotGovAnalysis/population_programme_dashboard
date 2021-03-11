@@ -53,9 +53,9 @@ indicator_order <- c("Population Structure",
                      "Population Change",
                      "Net Migration")
 
-variables <- c("Children (under 16 years)",
-               "Working Age (16 - 64)",
-               "Pensionable Age (65 and over)",
+variables <- c("% Children (under 16 years)",
+               "% Working Age (16 - 64)",
+               "% Pensionable Age (65 and over)",
                "",
                "Females",
                "Overall",
@@ -72,9 +72,9 @@ variables <- c("Children (under 16 years)",
                "Overseas",
                "Total")
 
-variable_order <- c("Children (under 16 years)",
-                    "Working Age (16 - 64)",
-                    "Pensionable Age (65 and over)",
+variable_order <- c("% Children (under 16 years)",
+                    "% Working Age (16 - 64)",
+                    "% Pensionable Age (65 and over)",
                     "",
                     "Females",
                     "Males",
@@ -112,7 +112,7 @@ pop_structure_age <- pop_structure %>%
          sex = "") %>% 
   filter(age != "All",
          period >= (current_year - 12)) %>% 
-  mutate("variable" = paste0(age, sex)) %>% 
+  mutate("variable" = paste0("% ", age, sex)) %>% 
   select(-c(age, sex))  %>% 
   mutate(indicator = paste(indicator, as.character(icon("info-sign", lib = "glyphicon",)))) %>% 
   group_by(area, variable, indicator) %>% 
