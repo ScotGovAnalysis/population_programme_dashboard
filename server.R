@@ -80,7 +80,8 @@ server <- function(input, output, session) {
                                council1_symbol, 
                                council2_symbol,
                                "line",
-                               "%")
+                               "%", 
+                               ymax = 100)
   })
   
   
@@ -106,7 +107,8 @@ server <- function(input, output, session) {
                                council1_symbol, 
                                council2_symbol,
                                "line",
-                               "")
+                               "", 
+                               ymax = 950)
   })
   
 # Life expectency ----------------------------------------------------
@@ -131,7 +133,8 @@ server <- function(input, output, session) {
                                council1_symbol,
                                council2_symbol,
                                "line",
-                               "")
+                               "", 
+                               ymax = 90)
   })
 
 # Migration ---------------------------------------------------------------
@@ -205,7 +208,8 @@ server <- function(input, output, session) {
                                 council1_symbol, 
                                 council2_symbol,
                                 "line",
-                                "")
+                                "", 
+                                ymax = 32)
   })
   # Pop Change by Data zone -------------------------------------------
   
@@ -229,7 +233,8 @@ server <- function(input, output, session) {
                                 council1_symbol, 
                                 council2_symbol,
                                 "line",
-                                "%")
+                                "%", 
+                                ymax = 100)
   })
 
 ##################################################################
