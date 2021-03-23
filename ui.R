@@ -58,18 +58,6 @@ ui <- navbarPage(position = "fixed-top",
     br(),
     br()),
   
-  # tabPanel(
-  #   "Narrative",
-  #   icon = icon("bar-chart-o"),
-  #   selectInput(
-  #     "indicator",
-  #     label = NULL,
-  #     choices = indicator_order,
-  #     selected = "Population Structure"
-  #   ),
-  #   h3("Under construction: Interactive detailed charts")
-  # ),
-  
   tabPanel(
     "About",
     icon = icon("info-circle"),

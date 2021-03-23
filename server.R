@@ -238,7 +238,7 @@ server <- function(input, output, session) {
   })
 
 ##################################################################
-##                            Tables                            ##
+##                            Table                             ##
 ##################################################################
 
   output$table1 <- renderDataTable({
@@ -302,12 +302,19 @@ server <- function(input, output, session) {
   
   output$key <- renderText({
 paste0("<h2>How to read this chart</h2>",
-      "<p>These charts give an overall picture. More detailed versions will be added in time.</p>",
-      "<p>Most charts run from years ", current_year-12, " - ", current_year-2, ". All the charts use the same horizontal scale</p>",
-      as.character(icon("arrow-up", lib = "glyphicon")), " Increase from last year", br(),
-      as.character(icon("arrow-down", lib = "glyphicon")), " Decrease from last year", br(),
-      as.character(icon("minus", lib = "glyphicon")), " No change from last year</p>",
-      "The arrows for <b> life expectancy</b> and <b> healthy life expectancy</b> are based on significant change."
+      "<p>These charts give an overall picture. 
+      More detailed versions will be added in time.</p>",
+      "<p>Most charts run from years ", 
+      current_year-12, " - ", current_year-2, 
+      ". All the charts use the same horizontal scale</p>",
+      as.character(icon("arrow-up", lib = "glyphicon")), 
+      " Increase from last year", br(),
+      as.character(icon("arrow-down", lib = "glyphicon")),
+      " Decrease from last year", br(),
+      as.character(icon("minus", lib = "glyphicon")),
+      " No change from last year</p>",
+      "The arrows for <b> life expectancy</b> and <b> healthy life 
+      expectancy</b> are based on significant change."
        )
     
   })
