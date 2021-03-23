@@ -30,7 +30,7 @@ significant_change_calulator <- function(estimate,
 
 # Format for LINE sparklines -----------------------------------------------
 
-sparkline_format <- function(type, y, x, unit) {
+sparkline_format <- function(type, y, x, unit, ymax) {
   
   if(type == "line"){
     spk_chr(
@@ -49,6 +49,8 @@ sparkline_format <- function(type, y, x, unit) {
       minSpotColor = F,
       maxSpotColor = F,
       lineWidth = 2,
+      chartRangeMin = 0,
+      chartRangeMax = ymax,
       spotRadius = 3,
       tooltipFormat = paste0('{{x}}: {{y}}', unit))
     
@@ -91,9 +93,9 @@ create_symbols_scotland <- function(data){
                               value == lag(value) ~ 0)) %>%
     filter(!is.na(change)) %>%
     mutate(icon = case_when(
-      change == 1 ~ as.character(icon("arrow-down", lib = "glyphicon")),
-      change == 2  ~ as.character(icon("arrow-up",lib = "glyphicon")),
-      change == 0 ~ as.character(icon("minus", lib = "glyphicon")))) %>%
+      change == 1 ~ as.character(icon("arrow-down", lib = "glyphicon", tags$span(class = "sr-only", "Decrease from last year"))),
+      change == 2  ~ as.character(icon("arrow-up",lib = "glyphicon", tags$span(class = "sr-only", "Increase from last year"))),
+      change == 0 ~ as.character(icon("minus", lib = "glyphicon", tags$span(class = "sr-only", "No change from last year"))))) %>%
     ungroup() %>%
     select(variable, icon)
 }
@@ -114,9 +116,9 @@ create_symbols_council1 <- function(data, council){
                                      value == lag(value) ~ 0)) %>%
     filter(!is.na(change)) %>%
     mutate(icon1 = case_when(
-      change == 1 ~ as.character(icon("arrow-down", lib = "glyphicon")),
-      change == 2 ~ as.character(icon("arrow-up",lib = "glyphicon")),
-      change == 0 ~ as.character(icon("minus", lib = "glyphicon")))) %>%
+      change == 1 ~ as.character(icon("arrow-down", lib = "glyphicon", tags$span(class = "sr-only", "Decrease from last year"))),
+      change == 2 ~ as.character(icon("arrow-up",lib = "glyphicon", tags$span(class = "sr-only", "Increase from last year"))),
+      change == 0 ~ as.character(icon("minus", lib = "glyphicon", tags$span(class = "sr-only", "No change from last year"))))) %>%
     ungroup() %>%
     select(variable, icon1)
 }
@@ -139,9 +141,9 @@ create_symbols_council2 <- function(data, council){
                               value == lag(value) ~ 0)) %>%
     filter(!is.na(change)) %>%
     mutate(icon2 = case_when(
-      change == 1 ~ as.character(icon("arrow-down", lib = "glyphicon")),
-      change == 2  ~ as.character(icon("arrow-up",lib = "glyphicon")),
-      change == 0 ~ as.character(icon("minus", lib = "glyphicon")))) %>%
+      change == 1 ~ as.character(icon("arrow-down", lib = "glyphicon", tags$span(class = "sr-only", "Decrease from last year"))),
+      change == 2  ~ as.character(icon("arrow-up",lib = "glyphicon", tags$span(class = "sr-only", "Increase from last year"))),
+      change == 0 ~ as.character(icon("minus", lib = "glyphicon", tags$span(class = "sr-only", "No change from last year"))))) %>%
     ungroup() %>%
     select(variable, icon2)
 }
@@ -175,9 +177,9 @@ create_LE_symbols_scotland <- function(data){
     na.omit() %>%
     ungroup() %>% 
     mutate(icon = case_when(
-      icon == 1 ~ as.character(icon("arrow-up",lib = "glyphicon")),
-      icon == 0 ~ as.character(icon("minus",lib = "glyphicon")),
-      icon == -1 ~ as.character(icon("arrow-down",lib = "glyphicon")))) %>% 
+      icon == 1 ~ as.character(icon("arrow-up",lib = "glyphicon", tags$span(class = "sr-only", "Significant increase from last year"))),
+      icon == 0 ~ as.character(icon("minus",lib = "glyphicon", tags$span(class = "sr-only", "No significant change from last year"))),
+      icon == -1 ~ as.character(icon("arrow-down",lib = "glyphicon", tags$span(class = "sr-only", "Significant decrease from last year"))))) %>% 
     select(variable, icon)
 }
 
@@ -207,9 +209,9 @@ create_LE_symbols_council1 <- function(data, council){
     na.omit() %>%
     ungroup() %>% 
     mutate(icon1 = case_when(
-      icon1 == 1 ~ as.character(icon("arrow-up",lib = "glyphicon")),
-      icon1 == 0 ~ as.character(icon("minus",lib = "glyphicon")),
-      icon1 == -1 ~ as.character(icon("arrow-down",lib = "glyphicon")))) %>% 
+      icon1 == 1 ~ as.character(icon("arrow-up",lib = "glyphicon", tags$span(class = "sr-only", "Significant increase from last year"))),
+      icon1 == 0 ~ as.character(icon("minus",lib = "glyphicon", tags$span(class = "sr-only", "No significant change from last year"))),
+      icon1 == -1 ~ as.character(icon("arrow-down",lib = "glyphicon", tags$span(class = "sr-only", "Significant decrease from last year"))))) %>% 
     select(variable, icon1)
 }
 
@@ -239,16 +241,16 @@ create_LE_symbols_council2 <- function(data, council){
     na.omit() %>%
     ungroup() %>% 
     mutate(icon2 = case_when(
-      icon2 == 1 ~ as.character(icon("arrow-up",lib = "glyphicon")),
-      icon2 == 0 ~ as.character(icon("minus",lib = "glyphicon")),
-      icon2 == -1 ~ as.character(icon("arrow-down",lib = "glyphicon")))) %>% 
+      icon2 == 1 ~ as.character(icon("arrow-up",lib = "glyphicon", tags$span(class = "sr-only", "Significant increase from last year"))),
+      icon2 == 0 ~ as.character(icon("minus",lib = "glyphicon", tags$span(class = "sr-only", "No significant change from last year"))),
+      icon2 == -1 ~ as.character(icon("arrow-down",lib = "glyphicon", tags$span(class = "sr-only", "Significant decrease from last year"))))) %>% 
     select(variable, icon2)
 }
 ##################################################################
 ##       Create data with sparklines and join the symbols       ##
 ##################################################################
 
-combine_columns_and_symbols <- function(data, x, y, a, b, c, type, unit){
+combine_columns_and_symbols <- function(data, x, y, a, b, c, type, unit, ymax){
   # Take data and create sparkline for just Scotland
   data %>%
   filter(area == "Scotland") %>%
@@ -256,7 +258,7 @@ combine_columns_and_symbols <- function(data, x, y, a, b, c, type, unit){
   group_by(indicator, variable) %>%
   summarise(
     # Sparkline for Scotland
-    "Scotland" = sparkline_format(type, value, period, unit)) %>%
+    "Scotland" = sparkline_format(type, value, period, unit, ymax)) %>%
   # Create and join sparkline for just user input 1
   left_join(
     data %>%
@@ -264,7 +266,7 @@ combine_columns_and_symbols <- function(data, x, y, a, b, c, type, unit){
       arrange(period) %>%
       group_by(indicator, variable) %>%
       # Sparkline for Council area input 1 (y)
-      summarise({{x}} := sparkline_format(type, value, period, unit))) %>%
+      summarise({{x}} := sparkline_format(type, value, period, unit, ymax))) %>%
   # Create and join sparkline for just user input 2
   left_join(
     data %>%
@@ -272,7 +274,7 @@ combine_columns_and_symbols <- function(data, x, y, a, b, c, type, unit){
       arrange(period) %>%
       group_by(indicator, variable) %>%
       # Sparkline for Council area input 2 (y)
-      summarise({{y}} := sparkline_format(type, value, period, unit))) %>%
+      summarise({{y}} := sparkline_format(type, value, period, unit, ymax))) %>%
   arrange(match(variable, variable_order)) %>%
   # Join all the symbol columns
   left_join(a) %>%
