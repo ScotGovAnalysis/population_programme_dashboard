@@ -83,18 +83,15 @@ create_symbols_scotland <- function(data){
                               value == lag(value) ~ 0)) %>%
     filter(!is.na(change)) %>%
     mutate(icon = case_when(
-      change == 1 ~ as.character(icon("arrow-down",
-                                      lib = "glyphicon",
-                                      tags$span(class = "sr-only",
-                                                "Decrease from last year"))),
-      change == 2  ~ as.character(icon("arrow-up",
-                                       lib = "glyphicon",
-                                       tags$span(class = "sr-only",
-                                       "Increase from last year"))),
-      change == 0 ~ as.character(icon("minus",
-                                      lib = "glyphicon",
-                                      tags$span(class = "sr-only",
-                                                "No change from last year"))))) %>%
+      change == 1 ~ str_c(icon("arrow-down", lib = "glyphicon"),
+                          tags$span(class = "sr-only", "Decrease from last year"),
+                          sep = " "),
+      change == 2  ~ str_c(icon("arrow-up", lib = "glyphicon"),
+                           tags$span(class = "sr-only", "Increase from last year"),
+                           sep = " "),
+      change == 0 ~ str_c(icon("minus", lib = "glyphicon"),
+                          tags$span(class = "sr-only", "No change from last year"),
+                           sep = " "))) %>%
     ungroup() %>%
     select(variable, icon)
 }
