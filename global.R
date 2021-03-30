@@ -7,6 +7,7 @@ library(dplyr)
 library(sparkline)
 library(DT)
 library(opendatascot)
+library(stringr)
 
 #################################################################
 ##                          File Paths                         ##
@@ -44,7 +45,7 @@ current_year <- lubridate::year(lubridate::today())
 # Generate years in quarters for current range.
 # e.g. "2009-Q1", "2009-Q2", "2009-Q3", "2009-Q4"
 current_quarter <- as.character(zoo::as.yearqtr(lubridate::today())) %>%
-  stringr::str_sub(start = -2)
+  str_sub(start = -2)
 year_quarters <- paste0(rep(as.character(c((current_year - 12):(current_year))),
                             each = length(current_quarter)), "-",
                            current_quarter)
