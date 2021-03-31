@@ -15,11 +15,17 @@ library(stringr)
 # File paths for static data files
 file_path_hle <- "data/HLE.xlsx"
 # Net Migration within Scotland
-file_path_net_with_scot <- "data/migflow-ca-01-latest-tab1.xlsx"
+net_within_scot_raw <- readxl::read_excel("data/migflow-ca-01-latest-tab1.xlsx",
+                                                  sheet = "TS - Internal Migration",
+                                                  range = "B81:T113")
 # Net Migration Overseas
-file_path_net_overseas <- "data/mig-overseas-admin-sex-tab1.xlsx"
+net_overseas_raw <- readxl::read_excel("data/mig-overseas-admin-sex-tab1.xlsx",
+                                                 sheet = "Net-Council Area-Sex",
+                                                 range = "B5:T38") 
 # Net Migration - Rest of the UK
-file_path_ruk <- "data/mig-uk-admin-sex-91-latest-tab2.xlsx"
+net_ruk_raw <- readxl::read_xlsx("data/mig-uk-admin-sex-91-latest-tab2.xlsx",
+                             sheet = "Net-Council-Sex (2001-)",
+                             range = "A5:T38")
 # Components of change
 file_path_natural_change <- "data/Natural change - 2009-2019.xlsx"
 
@@ -284,7 +290,7 @@ pop_change_by_data_zone <- pop_estimates_datazones %>%
     change = ifelse(value - lag(value) < 0, 1, 0),
     "variable" = "% Decreased data zones"
   ) %>%
-  filter(period != 2008) %>%
+  filter(period != current_year - 13) %>%
   # Add area names
   left_join(data_zone_lookup, by = c("zone" = "DZ2011_Code")) %>%
   rename("area" = LA_Name) %>%
@@ -300,7 +306,7 @@ pop_change_by_data_zone <- pop_estimates_datazones %>%
         change = ifelse(value - lag(value) < 0, 1, 0),
         "variable" = "% Decreased data zones"
       ) %>%
-      filter(period != 2008) %>%
+      filter(period != current_year - 13) %>%
       group_by(period, variable) %>%
       summarise(value = sum(change)) %>%
       mutate(area = "Scotland",
@@ -347,12 +353,8 @@ pop_change_by_data_zone <- pop_estimates_datazones %>%
 ##                     Net Within Scotland                     --
 ## ---------------------------------------------------------------
 
-net_within_scotland <- readxl::read_excel(
-  file_path_net_with_scot,
-  sheet = "TS - Internal Migration",
-  range = "B81:T113"
-) %>%
-  tidyr::pivot_longer(2:19,
+net_within_scotland <- net_within_scot_raw %>%
+  tidyr::pivot_longer(starts_with("20"),
                       names_to = "period",
                       values_to = "value") %>%
   rename("area" = `...1`) %>%
@@ -385,10 +387,8 @@ mutate(area = gsub("Total Moves within Scotland3", "Scotland", area),
 ##                      Net rest of the UK                      --
 ## ----------------------------------------------------------------
 
-net_ruk <- readxl::read_xlsx(file_path_ruk,
-                                   sheet = "Net-Council-Sex (2001-)",
-                                  range = "A5:T38") %>%
-  tidyr::pivot_longer(3:20,
+net_ruk <- net_ruk_raw %>%
+  tidyr::pivot_longer(starts_with("20"),
                       names_to = "period",
                       values_to = "value") %>%
   select("area" = `...2`,
@@ -404,10 +404,10 @@ net_ruk <- readxl::read_xlsx(file_path_ruk,
 ##                         Net Overseas                         --
 ## ----------------------------------------------------------------
 
-net_overseas <- readxl::read_excel(file_path_net_overseas,
-                                   sheet = "Net-Council Area-Sex",
-                                   range = c("B5:T38")) %>%
-  tidyr::pivot_longer(2:19, names_to = "period", values_to = "value") %>%
+net_overseas <- net_overseas_raw %>%
+  tidyr::pivot_longer(starts_with("20"), 
+                      names_to = "period", 
+                      values_to = "value") %>%
   select("area" = `...1`,
          period,
          value) %>%
