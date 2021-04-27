@@ -8,7 +8,7 @@ app](https://github.com/DataScienceScotland/population_programme_dashboard/blob/
 
 ## How it works
 
-Pulls the lastest data from the [SG open data platform](https://statistics.gov.scot/) and [NRS statistics](https://www.nrscotland.gov.uk/statistics-and-data/statistics/) and displays it in small multiples to provide an interactive overview of the trends for comparing Scotland with council areas.
+Pulls the lastest data from [NRS statistics](https://www.nrscotland.gov.uk/statistics-and-data/statistics/) and the [SG open data platform](https://statistics.gov.scot/) with [OpenDataScot](https://github.com/DataScienceScotland/opendatascot). Provides an interactive overview of the trends as small multiples with the ability to compare Scotland with the council areas.
 
 ## How to update
 1. Add new static data to data folder and update path files for static data in [`global.R`](https://github.com/DataScienceScotland/population_programme_dashboard/blob/master/global.R)
