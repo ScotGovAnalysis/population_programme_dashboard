@@ -52,6 +52,7 @@ current_year <- lubridate::year(lubridate::today())
 # e.g. "2009-Q1", "2009-Q2", "2009-Q3", "2009-Q4"
 current_quarter <- as.character(zoo::as.yearqtr(lubridate::today())) %>%
   str_sub(start = -2)
+
 year_quarters <- paste0(rep(as.character(c((current_year - 12):(current_year))),
                             each = length(current_quarter)), "-",
                            current_quarter)
@@ -104,7 +105,7 @@ source("SPARQL_queries.R")
 source("functions.R")
 
 ##################################################################
-##                       Reading Raw Data                       ##
+##                 Reading & cleaning Raw Data                  ##
 ##################################################################
 
 ##----------------------------------------------------------------
@@ -118,16 +119,17 @@ pop_structure <- opendatascot:::ods_query_database(endpoint,
 # Population structure by age ---------------------------------------------
 
 pop_structure_age <- pop_structure %>%
-  mutate("indicator" = "Population Structure",
-         sex = "") %>%
+  mutate("indicator" = "Population Structure") %>%
   filter(age != "All",
          period >= (current_year - 12)) %>%
-  mutate("variable" = paste0("% ", age, sex)) %>%
+  mutate("variable" = paste0("% ", age)) %>%
   select(-c(age, sex))  %>%
-  mutate(indicator = paste(indicator,
-                           as.character(icon("info-sign",
-                                             lib = "glyphicon")))) %>%
+  mutate(indicator = paste(
+    indicator,
+    as.character(icon("info-sign",
+                      lib = "glyphicon")))) %>%
   group_by(area, variable, indicator) %>%
+  # Fill in any missing years with NA
   tidyr::complete(period = tidyr::full_seq(
     (current_year - 12):(current_year - 1), 1)) %>%
   group_by(area, period) %>%
@@ -149,8 +151,8 @@ pop_change_by_council_area <- pop_structure %>%
   # Sum the number of decreased areas for Scotland's total
   summarise(value = sum(change)) %>%
   mutate(area = "Scotland") %>%
+  # Repeat for number of increased population areas
   rbind(pop_structure %>%
-          # Remove scotland and calculate number of increased population areas
           filter(age == "All",
                  area != "Scotland") %>%
           group_by(area) %>%
