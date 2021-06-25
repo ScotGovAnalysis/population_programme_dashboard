@@ -17,17 +17,17 @@ file_path_hle <- "data/HLE.xlsx"
 # Net Migration within Scotland
 net_within_scot_raw <- readxl::read_excel("data/migflow-ca-01-latest-tab1.xlsx",
                                                   sheet = "TS - Internal Migration",
-                                                  range = "B81:T113")
+                                                  range = "B81:U113")
 # Net Migration Overseas
 net_overseas_raw <- readxl::read_excel("data/mig-overseas-admin-sex-tab1.xlsx",
                                                  sheet = "Net-Council Area-Sex",
-                                                 range = "B5:T38") 
+                                                 range = "B5:U38") 
 # Net Migration - Rest of the UK
 net_ruk_raw <- readxl::read_xlsx("data/mig-uk-admin-sex-91-latest-tab2.xlsx",
                              sheet = "Net-Council-Sex (2001-)",
-                             range = "A5:T38")
+                             range = "A5:U38")
 # Components of change
-file_path_natural_change <- "data/Natural change - 2009-2019.xlsx"
+file_path_natural_change <- "data/Natural change - 2009-2020.xlsx"
 
 #################################################################
 ##                          Variables                          ##
