@@ -305,7 +305,7 @@ paste0("<h2>How to read this chart</h2>",
       "<p>These charts give an overall picture. 
       More detailed versions will be added in time.</p>",
       "<p>Most charts run from years ", 
-      current_year-12, " - ", current_year-2, 
+      current_year-12, " - ", current_year-1, 
       ". All the charts use the same horizontal scale</p>",
       as.character(icon("arrow-up", lib = "glyphicon")), 
       " Increase from last year", br(),
